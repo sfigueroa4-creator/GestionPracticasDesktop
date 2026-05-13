@@ -5,44 +5,66 @@
  */
 package com.practicas.service;
 
+import com.practicas.dao.UsuarioDAO;
 import com.practicas.model.Usuario;
-import com.practicas.repository.UsuarioRepository;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 
 public class AuthService {
 
-    private UsuarioRepository usuarioRepository;
+    private UsuarioDAO usuarioDAO;
 
-    public AuthService() {
-        usuarioRepository = new UsuarioRepository();
+    public AuthService(Connection conn) {
+        usuarioDAO = new UsuarioDAO(conn);
     }
 
+public boolean registrarUsuario(Usuario usuario) {
 
-    public void registrarUsuario(Usuario usuario) {
-        usuarioRepository.guardar(usuario);
+    try {
+
+        usuarioDAO.insertar(usuario);
+        return true;
+
+    } catch (SQLException e) {
+
+        System.out.println("Error al registrar usuario:");
+        e.printStackTrace();
+
+        return false;
     }
+}
+    public void mostrarUsuarios() {
 
+        try {
+
+            for (Usuario u : usuarioDAO.listar()) {
+
+                System.out.println(
+                    u.getNombreCompleto()
+                    + " - " +
+                    u.getEmail()
+                );
+            }
+
+        } catch (SQLException e) {
+
+            System.out.println("Error al listar usuarios:");
+            e.printStackTrace();
+        }
+    }
 
     public Usuario login(String email, String password) {
-        Usuario usuario = usuarioRepository.buscarPorEmail(email);
 
-        if (usuario != null &&
-            usuario.getPasswordHash().equals(password) &&
-            usuario.isActivo()) {
+        try {
 
-            return usuario;
+            return usuarioDAO.login(email, password);
+
+        } catch (SQLException e) {
+
+            e.printStackTrace();
         }
 
         return null;
-    }
-
-    public void mostrarUsuarios() {
-        for (Usuario u : usuarioRepository.listar()) {
-            System.out.println(
-                u.getNombreCompleto() +
-                " - " +
-                u.getEmail()
-            );
-        }
     }
 }

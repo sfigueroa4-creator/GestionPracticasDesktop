@@ -19,35 +19,37 @@ public class UsuarioDAO {
         this.conn = conn;
     }
 
-    public void insertar(Usuario u) throws SQLException {
+public void insertar(Usuario u) throws SQLException {
 
-        String sql = """
-            INSERT INTO USUARIO
-            (ID_USUARIO, NOMBRE, APELLIDO, EMAIL, PASSWORD_HASH,
-             ROL, ACTIVO, TELEFONO, FECHA_CREACION)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """;
+    String sql = """
+        INSERT INTO USUARIO
+        (NOMBRE, APELLIDO, EMAIL, PASSWORD_HASH,
+        ROL, ACTIVO, TELEFONO, FECHA_CREACION)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    """;
 
-        PreparedStatement ps = conn.prepareStatement(sql);
+    PreparedStatement ps = conn.prepareStatement(sql);
 
-        ps.setInt(1, u.getIdUsuario());
-        ps.setString(2, u.getNombre());
-        ps.setString(3, u.getApellido());
-        ps.setString(4, u.getEmail());
-        ps.setString(5, u.getPasswordHash());
+    ps.setString(1, u.getNombre());
+    ps.setString(2, u.getApellido());
+    ps.setString(3, u.getEmail());
+    ps.setString(4, u.getPasswordHash());
 
-        ps.setString(6, u.getRol().name());
+    ps.setString(5, u.getRol().name());
 
-        ps.setInt(7, u.isActivo() ? 1 : 0);
-        ps.setString(8, u.getTelefono());
+    ps.setInt(6, u.isActivo() ? 1 : 0);
 
-        ps.setTimestamp(9, u.getFechaCreacion() != null
-                ? Timestamp.valueOf(u.getFechaCreacion())
-                : null);
+    ps.setString(7, u.getTelefono());
 
-        ps.executeUpdate();
-        ps.close();
-    }
+    ps.setTimestamp(8,
+        u.getFechaCreacion() != null
+            ? Timestamp.valueOf(u.getFechaCreacion())
+            : null
+    );
+
+    ps.executeUpdate();
+    ps.close();
+}
 
 
     public List<Usuario> listar() throws SQLException {
@@ -88,9 +90,7 @@ public class UsuarioDAO {
         return lista;
     }
 
-    // =========================
-    // UPDATE
-    // =========================
+
     public void actualizar(Usuario u) throws SQLException {
 
         String sql = """
@@ -114,15 +114,16 @@ public class UsuarioDAO {
         ps.setString(5, u.getRol().name());
         ps.setInt(6, u.isActivo() ? 1 : 0);
         ps.setString(7, u.getTelefono());
-        ps.setInt(8, u.getIdUsuario());
-
+    ps.setTimestamp(8,
+        u.getFechaCreacion() != null
+        ? Timestamp.valueOf(u.getFechaCreacion())
+        : null
+    );
         ps.executeUpdate();
         ps.close();
     }
 
-    // =========================
-    // DELETE
-    // =========================
+
     public void eliminar(int idUsuario) throws SQLException {
 
         String sql = "DELETE FROM USUARIO WHERE ID_USUARIO = ?";
@@ -135,9 +136,7 @@ public class UsuarioDAO {
         ps.close();
     }
 
-    // =========================
-    // LOGIN (BONUS útil)
-    // =========================
+
     public Usuario login(String email, String passwordHash) throws SQLException {
 
         String sql = "SELECT * FROM USUARIO WHERE EMAIL = ? AND PASSWORD_HASH = ? AND ACTIVO = 1";

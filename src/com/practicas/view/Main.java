@@ -23,23 +23,25 @@ String usuarioBD = "GestionP";
 String passwordBD = "GestionP";
 String servicioBD = "orcl";
 
+java.sql.Connection con = null;
+
 try {
-    java.sql.Connection con =
-            com.practicas.util.DatabaseConnection.getConnection(
-                    usuarioBD,
-                    passwordBD,
-                    servicioBD
-            );
+
+    con = com.practicas.util.DatabaseConnection.getConnection(
+            usuarioBD,
+            passwordBD,
+            servicioBD
+    );
 
     System.out.println("Conexión exitosa con Oracle.\n");
-    con.close();
 
 } catch (Exception e) {
+
     System.out.println("Error de conexión: " + e.getMessage());
     return;
 }
 
-        AuthService authService = new AuthService();
+        AuthService authService = new AuthService(con);
         PracticaService practicaService = new PracticaService();
 
         int opcion;
@@ -76,9 +78,11 @@ try {
                     usuario.setRol(RolUsuario.ESTUDIANTE);
                     usuario.setActivo(true);
 
-                    authService.registrarUsuario(usuario);
-
-                    System.out.println("Usuario registrado correctamente.");
+                    if (authService.registrarUsuario(usuario)) {
+                        System.out.println("Usuario registrado correctamente.");
+                    } else {
+                        System.out.println("No se pudo registrar el usuario.");
+                    }
                     break;
 
                 case 2:
@@ -115,7 +119,11 @@ try {
             }
 
         } while (opcion != 5);
-
+    try {
+        con.close();
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
         scanner.close();
     }
 }
