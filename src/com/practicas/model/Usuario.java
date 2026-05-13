@@ -4,7 +4,6 @@
  * and open the template in the editor.
  */
 package com.practicas.model;
-
 import java.time.LocalDateTime;
 
 
@@ -22,7 +21,6 @@ public class Usuario {
 
     public Usuario() {
     }
-
 
     public Usuario(String nombre, String apellido, String email,
                    String passwordHash, RolUsuario rol) {

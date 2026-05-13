@@ -18,9 +18,7 @@ public class GrupoPracticaDAO {
         this.conn = conn;
     }
 
-    // =========================
-    // CREATE
-    // =========================
+
     public void insertar(GrupoPractica g) throws SQLException {
 
         String sql = """
@@ -45,9 +43,6 @@ public class GrupoPracticaDAO {
         ps.close();
     }
 
-    // =========================
-    // READ ALL
-    // =========================
     public List<GrupoPractica> listar() throws SQLException {
 
         List<GrupoPractica> lista = new ArrayList<>();
@@ -66,7 +61,6 @@ public class GrupoPracticaDAO {
             g.setCupoMaximo(rs.getInt("CUPO_MAXIMO"));
             g.setObservaciones(rs.getString("OBSERVACIONES"));
 
-            // ⚠️ Aquí solo cargas IDs (no objetos completos)
             lista.add(g);
         }
 
@@ -76,9 +70,7 @@ public class GrupoPracticaDAO {
         return lista;
     }
 
-    // =========================
-    // UPDATE
-    // =========================
+
     public void actualizar(GrupoPractica g) throws SQLException {
 
         String sql = """
@@ -100,9 +92,7 @@ public class GrupoPracticaDAO {
         ps.close();
     }
 
-    // =========================
-    // DELETE
-    // =========================
+
     public void eliminar(int idGrupo) throws SQLException {
 
         String sql = "DELETE FROM GRUPO_PRACTICA WHERE ID_GRUPO = ?";
