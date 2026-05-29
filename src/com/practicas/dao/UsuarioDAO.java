@@ -35,7 +35,7 @@ public void insertar(Usuario u) throws SQLException {
     ps.setString(3, u.getEmail());
     ps.setString(4, u.getPasswordHash());
 
-    ps.setString(5, u.getRol().name());
+    ps.setString(5,u.getRol() != null? u.getRol().name():null);
 
     ps.setInt(6, u.isActivo() ? 1 : 0);
 
@@ -101,7 +101,8 @@ public void insertar(Usuario u) throws SQLException {
                 PASSWORD_HASH = ?,
                 ROL = ?,
                 ACTIVO = ?,
-                TELEFONO = ?
+                TELEFONO = ?,
+                FECHA_CREACION = ?
             WHERE ID_USUARIO = ?
         """;
 
@@ -111,7 +112,7 @@ public void insertar(Usuario u) throws SQLException {
         ps.setString(2, u.getApellido());
         ps.setString(3, u.getEmail());
         ps.setString(4, u.getPasswordHash());
-        ps.setString(5, u.getRol().name());
+        ps.setString(5,u.getRol() != null? u.getRol().name(): null);
         ps.setInt(6, u.isActivo() ? 1 : 0);
         ps.setString(7, u.getTelefono());
     ps.setTimestamp(8,
@@ -119,6 +120,9 @@ public void insertar(Usuario u) throws SQLException {
         ? Timestamp.valueOf(u.getFechaCreacion())
         : null
     );
+    
+    ps.setInt(9, u.getIdUsuario());
+    
         ps.executeUpdate();
         ps.close();
     }

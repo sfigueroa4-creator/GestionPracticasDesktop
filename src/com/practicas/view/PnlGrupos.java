@@ -39,7 +39,17 @@ public class PnlGrupos extends JPanel {
 
         add(formulario, BorderLayout.NORTH);
 
-        modelo = new DefaultTableModel();
+modelo = new DefaultTableModel() {
+
+    @Override
+    public boolean isCellEditable(
+            int row,
+            int column
+    ) {
+
+        return false;
+    }
+};
 
         modelo.addColumn("Grupo");
         modelo.addColumn("Cupo");

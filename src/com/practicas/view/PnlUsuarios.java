@@ -8,6 +8,10 @@ import java.awt.*;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
+import com.practicas.model.Usuario;
+import com.practicas.model.RolUsuario;
+import com.practicas.service.AuthService;
+
 public class PnlUsuarios extends JPanel {
 
     private JTable tabla;
@@ -17,16 +21,44 @@ public class PnlUsuarios extends JPanel {
     private JTextField txtApellido;
     private JTextField txtEmail;
 
+    private AuthService authService;
+
     public PnlUsuarios() {
 
         setLayout(new BorderLayout());
+
+        // =========================
+        // CONEXIÓN
+        // =========================
+
+        try {
+
+            java.sql.Connection con =
+                com.practicas.util.DatabaseConnection.getConnection(
+                    "GestionP",
+                    "GestionP",
+                    "orcl"
+                );
+
+            authService = new AuthService(con);
+
+        } catch (Exception e) {
+
+            JOptionPane.showMessageDialog(
+                this,
+                "Error de conexión: " + e.getMessage()
+            );
+        }
 
         // =========================
         // FORMULARIO
         // =========================
 
         JPanel panelFormulario = new JPanel();
-        panelFormulario.setLayout(new GridLayout(4,2,5,5));
+
+        panelFormulario.setLayout(
+            new GridLayout(4,2,5,5)
+        );
 
         txtNombre = new JTextField();
         txtApellido = new JTextField();
@@ -51,7 +83,17 @@ public class PnlUsuarios extends JPanel {
         // TABLA
         // =========================
 
-        modelo = new DefaultTableModel();
+modelo = new DefaultTableModel() {
+
+    @Override
+    public boolean isCellEditable(
+            int row,
+            int column
+    ) {
+
+        return false;
+    }
+};
 
         modelo.addColumn("Nombre");
         modelo.addColumn("Apellido");
@@ -67,22 +109,90 @@ public class PnlUsuarios extends JPanel {
         // EVENTO
         // =========================
 
-        btnGuardar.addActionListener(e -> guardarUsuario());
+        btnGuardar.addActionListener(
+            e -> guardarUsuario()
+        );
+
+        // =========================
+        // CARGAR DATOS
+        // =========================
+
+        cargarUsuarios();
     }
 
     private void guardarUsuario() {
 
-        String nombre = txtNombre.getText();
-        String apellido = txtApellido.getText();
-        String email = txtEmail.getText();
+        try {
 
-        modelo.addRow(new Object[]{
-            nombre,
-            apellido,
-            email
-        });
+            Usuario usuario = new Usuario();
 
-        limpiar();
+            usuario.setNombre(txtNombre.getText());
+            usuario.setApellido(txtApellido.getText());
+            usuario.setEmail(txtEmail.getText());
+
+            usuario.setPasswordHash("123456");
+
+            usuario.setRol(RolUsuario.ESTUDIANTE);
+
+            usuario.setActivo(true);
+
+            boolean guardado =
+                authService.registrarUsuario(usuario);
+
+            if (guardado) {
+
+                modelo.addRow(new Object[] {
+                    usuario.getNombre(),
+                    usuario.getApellido(),
+                    usuario.getEmail()
+                });
+
+                JOptionPane.showMessageDialog(
+                    this,
+                    "Usuario guardado correctamente"
+                );
+
+                limpiar();
+
+            } else {
+
+                JOptionPane.showMessageDialog(
+                    this,
+                    "No se pudo guardar"
+                );
+            }
+
+        } catch (Exception e) {
+
+            JOptionPane.showMessageDialog(
+                this,
+                "Error: " + e.getMessage()
+            );
+        }
+    }
+
+    private void cargarUsuarios() {
+
+        try {
+
+            modelo.setRowCount(0);
+
+            for (Usuario u : authService.obtenerUsuarios()) {
+
+                modelo.addRow(new Object[] {
+                    u.getNombre(),
+                    u.getApellido(),
+                    u.getEmail()
+                });
+            }
+
+        } catch (Exception e) {
+
+            JOptionPane.showMessageDialog(
+                this,
+                "Error cargando usuarios"
+            );
+        }
     }
 
     private void limpiar() {

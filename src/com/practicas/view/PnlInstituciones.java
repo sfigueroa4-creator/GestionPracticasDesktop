@@ -44,7 +44,17 @@ public class PnlInstituciones extends JPanel {
 
         add(formulario, BorderLayout.NORTH);
 
-        modelo = new DefaultTableModel();
+modelo = new DefaultTableModel() {
+
+    @Override
+    public boolean isCellEditable(
+            int row,
+            int column
+    ) {
+
+        return false;
+    }
+};
 
         modelo.addColumn("Nombre");
         modelo.addColumn("NIT");

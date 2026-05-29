@@ -10,6 +10,8 @@ import com.practicas.model.Usuario;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AuthService {
 
@@ -67,4 +69,17 @@ public boolean registrarUsuario(Usuario usuario) {
 
         return null;
     }
+    public List<Usuario> obtenerUsuarios() {
+
+    try {
+
+        return usuarioDAO.listar();
+
+    } catch (SQLException e) {
+
+        e.printStackTrace();
+    }
+
+    return new ArrayList<>();
+}
 }

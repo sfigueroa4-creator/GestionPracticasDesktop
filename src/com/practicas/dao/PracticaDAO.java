@@ -22,35 +22,42 @@ public class PracticaDAO {
     // CREATE
     // =========================
     public void insertar(Practica p) throws SQLException {
+        
+        if (p == null) {
+
+         throw new SQLException(
+                "La práctica es null"
+            );
+        }
 
         String sql = """
             INSERT INTO PRACTICA
-            (ID_PRACTICA, NOMBRE, DESCRIPCION, NUMERO_PRACTICA,
-             HORAS_REGLAMENTARIAS, FECHA_INICIO, FECHA_FIN,
-             ESTADO, TIPO_PRACTICA, FECHA_CREACION)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            (NOMBRE, DESCRIPCION, NUMERO_PRACTICA,
+             HORAS_REGLAMENTARIAS, FECHA_INICIO,
+             FECHA_FIN, ESTADO, TIPO_PRACTICA,
+             FECHA_CREACION)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         """;
 
         PreparedStatement ps = conn.prepareStatement(sql);
 
-        ps.setInt(1, p.getIdPractica());
-        ps.setString(2, p.getNombre());
-        ps.setString(3, p.getDescripcion());
-        ps.setInt(4, p.getNumeroPractica());
-        ps.setInt(5, p.getHorasReglamentarias());
+        ps.setString(1, p.getNombre());
+        ps.setString(2, p.getDescripcion());
+        ps.setInt(3, p.getNumeroPractica());
+        ps.setInt(4, p.getHorasReglamentarias());
 
-        ps.setDate(6, p.getFechaInicio() != null
-                ? Date.valueOf(p.getFechaInicio())
+        ps.setDate(5, p.getFechaInicio() != null
+                ? java.sql.Date.valueOf(p.getFechaInicio())
                 : null);
 
-        ps.setDate(7, p.getFechaFin() != null
-                ? Date.valueOf(p.getFechaFin())
+        ps.setDate(6, p.getFechaFin() != null
+                ? java.sql.Date.valueOf(p.getFechaFin())
                 : null);
 
-        ps.setString(8, p.getEstado().name());
-        ps.setString(9, p.getTipoPractica());
+        ps.setString(7,p.getEstado() != null ? p.getEstado().name(): null);
+        ps.setString(8, p.getTipoPractica());
 
-        ps.setTimestamp(10, p.getFechaCreacion() != null
+        ps.setTimestamp(9, p.getFechaCreacion() != null
                 ? Timestamp.valueOf(p.getFechaCreacion())
                 : null);
 
@@ -65,7 +72,20 @@ public class PracticaDAO {
 
         List<Practica> lista = new ArrayList<>();
 
-        String sql = "SELECT * FROM PRACTICA";
+        String sql = """ 
+                     SELECT
+                         ID_PRACTICA,
+                         NOMBRE,
+                         DESCRIPCION,
+                         NUMERO_PRACTICA,
+                         HORAS_REGLAMENTARIAS,
+                         FECHA_INICIO,
+                         FECHA_FIN,
+                         ESTADO,
+                         TIPO_PRACTICA,
+                         FECHA_CREACION
+                     FROM PRACTICA
+                     """;
 
         PreparedStatement ps = conn.prepareStatement(sql);
         ResultSet rs = ps.executeQuery();
@@ -80,13 +100,22 @@ public class PracticaDAO {
             p.setNumeroPractica(rs.getInt("NUMERO_PRACTICA"));
             p.setHorasReglamentarias(rs.getInt("HORAS_REGLAMENTARIAS"));
 
-            Date fi = rs.getDate("FECHA_INICIO");
+            java.sql.Date fi = rs.getDate("FECHA_INICIO");
             if (fi != null) p.setFechaInicio(fi.toLocalDate());
 
-            Date ff = rs.getDate("FECHA_FIN");
+            java.sql.Date ff = rs.getDate("FECHA_FIN");
             if (ff != null) p.setFechaFin(ff.toLocalDate());
 
-            p.setEstado(Practica.EstadoPractica.valueOf(rs.getString("ESTADO")));
+            String estado = rs.getString("ESTADO");
+
+            if (estado != null) {
+
+            p.setEstado(
+            Practica.EstadoPractica.valueOf(
+                estado
+            )
+        );
+}
             p.setTipoPractica(rs.getString("TIPO_PRACTICA"));
 
             Timestamp fc = rs.getTimestamp("FECHA_CREACION");
@@ -119,7 +148,7 @@ public class PracticaDAO {
             WHERE ID_PRACTICA = ?
         """;
 
-        PreparedStatement ps = conn.prepareStatement(sql);
+        try (PreparedStatement ps = conn.prepareStatement(sql)){
 
         ps.setString(1, p.getNombre());
         ps.setString(2, p.getDescripcion());
@@ -127,19 +156,19 @@ public class PracticaDAO {
         ps.setInt(4, p.getHorasReglamentarias());
 
         ps.setDate(5, p.getFechaInicio() != null
-                ? Date.valueOf(p.getFechaInicio())
+                ? java.sql.Date.valueOf(p.getFechaInicio())
                 : null);
 
         ps.setDate(6, p.getFechaFin() != null
-                ? Date.valueOf(p.getFechaFin())
+                ? java.sql.Date.valueOf(p.getFechaFin())
                 : null);
 
-        ps.setString(7, p.getEstado().name());
+        ps.setString(7,p.getEstado() != null ? p.getEstado().name(): null);
         ps.setString(8, p.getTipoPractica());
         ps.setInt(9, p.getIdPractica());
 
         ps.executeUpdate();
-        ps.close();
+        }
     }
 
     // =========================
@@ -149,11 +178,11 @@ public class PracticaDAO {
 
         String sql = "DELETE FROM PRACTICA WHERE ID_PRACTICA = ?";
 
-        PreparedStatement ps = conn.prepareStatement(sql);
+        try (PreparedStatement ps = conn.prepareStatement(sql)){
 
         ps.setInt(1, idPractica);
 
         ps.executeUpdate();
-        ps.close();
+        }
     }
 }
