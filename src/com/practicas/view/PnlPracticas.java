@@ -86,8 +86,7 @@ public class PnlPracticas extends JPanel {
             java.sql.Connection con =
                 com.practicas.util.DatabaseConnection.getConnection(
                     "GestionP",
-                    "GestionP",
-                    "XEPDB1"
+                    "GestionP"
                 );
 
             practicaService = new PracticaService(con);

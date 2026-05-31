@@ -32,8 +32,7 @@ public class PnlUsuarios extends JPanel {
             java.sql.Connection con =
                 com.practicas.util.DatabaseConnection.getConnection(
                     "GestionP",
-                    "GestionP",
-                    "XEPDB1"
+                    "GestionP"
                 );
 
             authService = new AuthService(con);

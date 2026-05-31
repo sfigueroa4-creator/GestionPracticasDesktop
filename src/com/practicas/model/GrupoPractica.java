@@ -74,4 +74,9 @@ public class GrupoPractica {
     public void setObservaciones(String observaciones) {
         this.observaciones = observaciones;
     }
+    
+    @Override
+    public String toString() {
+        return nombre;
+    }
 }

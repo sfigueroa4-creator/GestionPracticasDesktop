@@ -13,11 +13,21 @@ public class DatabaseConnection {
 
     public static Connection getConnection(
             String usuario,
-            String password,
-            String servicio) throws SQLException {
+            String password)
+            throws SQLException {
 
-        String url = "jdbc:oracle:thin:@//localhost:1521/"+servicio;
+        String url =
+            "jdbc:oracle:thin:@//"
+            + DatabaseConfig.getHost()
+            + ":"
+            + DatabaseConfig.getPuerto()
+            + "/"
+            + DatabaseConfig.getServicio();
 
-        return DriverManager.getConnection(url, usuario, password);
+        return DriverManager.getConnection(
+            url,
+            usuario,
+            password
+        );
     }
 }

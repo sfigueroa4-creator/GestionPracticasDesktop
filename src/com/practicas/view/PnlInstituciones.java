@@ -30,8 +30,7 @@ public class PnlInstituciones extends JPanel {
         com.practicas.util.DatabaseConnection
             .getConnection(
                 "GestionP",
-                "GestionP",
-                "XEPDB1"
+                "GestionP"
             );
 
     institucionDAO =

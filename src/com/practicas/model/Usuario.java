@@ -107,8 +107,13 @@ public class Usuario {
     public void setFechaCreacion(LocalDateTime fechaCreacion) {
         this.fechaCreacion = fechaCreacion;
     }
-    @Override
+   @Override
     public String toString() {
-        return nombre + " " + apellido;
-    }
+
+        if (apellido == null) {
+            return nombre;
+        }
+
+            return nombre + " " + apellido;
+        }
 }

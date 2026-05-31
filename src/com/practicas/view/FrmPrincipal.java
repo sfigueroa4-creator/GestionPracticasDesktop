@@ -20,8 +20,7 @@ public class FrmPrincipal extends JFrame {
         try {
             conn = DatabaseConnection.getConnection(
                     "GestionP",
-                    "GestionP",
-                    "XEPDB1"
+                    "GestionP"
             );
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(

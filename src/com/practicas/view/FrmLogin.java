@@ -25,23 +25,23 @@ public class FrmLogin extends JFrame {
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        setLayout(new BorderLayout());
-
-       ImageIcon icon = new ImageIcon(
-            getClass().getResource("/com/practicas/Img/IconProyecto.png")
+        ImageIcon icon = new ImageIcon(
+            getClass().getResource(
+                "/com/practicas/Img/IconProyecto.png"
+            )
         );
 
         setIconImage(icon.getImage());
+
         setLayout(new BorderLayout());
-        
+
         try {
 
             Connection con =
                 com.practicas.util.DatabaseConnection
                     .getConnection(
                         "GestionP",
-                        "GestionP",
-                        "XEPDB1"
+                        "GestionP"
                     );
 
             authService =
@@ -51,33 +51,89 @@ public class FrmLogin extends JFrame {
 
             JOptionPane.showMessageDialog(
                 this,
-                "Error conexión: " +
-                e.getMessage()
+                "Error conexión: "
+                + e.getMessage()
             );
         }
 
-        JPanel panel = new JPanel(
-            new GridLayout(3,2,5,5)
+        JButton btnConfig =
+            new JButton("⚙");
+
+        JPanel panelSuperior =
+            new JPanel(
+                new FlowLayout(
+                    FlowLayout.RIGHT
+                )
+            );
+
+        panelSuperior.add(
+            btnConfig
         );
 
-        txtEmail = new JTextField();
+        add(
+            panelSuperior,
+            BorderLayout.NORTH
+        );
+
+        btnConfig.addActionListener(
+            e -> {
+
+                FrmConfiguracionBD frm =
+                    new FrmConfiguracionBD(
+                        this
+                    );
+
+                frm.setVisible(true);
+            }
+        );
+
+        JPanel panel =
+            new JPanel(
+                new GridLayout(
+                    3,
+                    2,
+                    5,
+                    5
+                )
+            );
+
+        txtEmail =
+            new JTextField();
 
         txtPassword =
             new JPasswordField();
 
-        panel.add(new JLabel("Usuario"));
-        panel.add(txtEmail);
+        panel.add(
+            new JLabel("Usuario")
+        );
 
-        panel.add(new JLabel("Contraseña"));
-        panel.add(txtPassword);
+        panel.add(
+            txtEmail
+        );
+
+        panel.add(
+            new JLabel("Contraseña")
+        );
+
+        panel.add(
+            txtPassword
+        );
 
         JButton btnLogin =
             new JButton("Ingresar");
 
-        panel.add(new JLabel());
-        panel.add(btnLogin);
+        panel.add(
+            new JLabel()
+        );
 
-        add(panel, BorderLayout.CENTER);
+        panel.add(
+            btnLogin
+        );
+
+        add(
+            panel,
+            BorderLayout.CENTER
+        );
 
         btnLogin.addActionListener(
             e -> login()
@@ -106,8 +162,8 @@ public class FrmLogin extends JFrame {
 
                 JOptionPane.showMessageDialog(
                     this,
-                    "Bienvenido " +
-                    usuario.getNombre()
+                    "Bienvenido "
+                    + usuario.getNombre()
                 );
 
                 FrmPrincipal frm =
@@ -129,8 +185,8 @@ public class FrmLogin extends JFrame {
 
             JOptionPane.showMessageDialog(
                 this,
-                "Error: " +
-                e.getMessage()
+                "Error: "
+                + e.getMessage()
             );
         }
     }
