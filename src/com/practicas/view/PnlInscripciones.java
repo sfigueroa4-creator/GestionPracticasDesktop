@@ -25,7 +25,7 @@ public class PnlInscripciones extends JPanel {
     private JComboBox<GrupoPractica> cbGrupo;
     private JTextField txtHoras;
 
-    // Todos excepto ESTUDIANTE e INSTITUCION pueden escribir
+
     private static boolean puedeEscribir(Usuario u) {
         if (u == null) return false;
         RolUsuario rol = u.getRol();
@@ -70,7 +70,6 @@ public class PnlInscripciones extends JPanel {
         JButton btnGuardar = new JButton("Guardar");
         formulario.add(btnGuardar);
 
-        // Deshabilitar controles de escritura si el rol no lo permite
         cbEstudiante.setEnabled(escritura);
         cbGrupo.setEnabled(escritura);
         txtHoras.setEditable(escritura);

@@ -14,7 +14,6 @@ $base    = $PSScriptRoot
 $dist    = "$base\dist\GestionPracticasDesktop.jar"
 $lib     = "$base\lib"
 $release = "$base\release"
-$tmp     = "$base\build\fat-jar-tmp"
 $fatJar  = "$release\GestionPracticasDesktop.jar"
 
 # --- Verificaciones previas ---
@@ -39,36 +38,59 @@ if (-not (Test-Path "$lib\ojdbc17.jar")) {
 Write-Host ""
 Write-Host "Generando release..." -ForegroundColor Cyan
 
-# --- Limpiar directorios temporales y release anterior ---
-if (Test-Path $tmp)     { Remove-Item $tmp     -Recurse -Force }
-if (Test-Path $release) { Remove-Item $release -Recurse -Force }
-New-Item -ItemType Directory -Path $tmp     | Out-Null
-New-Item -ItemType Directory -Path $release | Out-Null
-
-# --- Descomprimir el driver ojdbc en el directorio temporal ---
-Write-Host "  Descomprimiendo ojdbc17.jar..."
-Add-Type -AssemblyName System.IO.Compression.FileSystem
-[System.IO.Compression.ZipFile]::ExtractToDirectory("$lib\ojdbc17.jar", $tmp)
-
-# --- Descomprimir el JAR compilado encima (clases del proyecto) ---
-Write-Host "  Descomprimiendo clases del proyecto..."
-[System.IO.Compression.ZipFile]::ExtractToDirectory($dist, $tmp)
-
-# --- Eliminar el MANIFEST del driver para usar el nuestro ---
-$manifestDir = "$tmp\META-INF"
-if (Test-Path "$manifestDir\MANIFEST.MF") {
-    Remove-Item "$manifestDir\MANIFEST.MF" -Force
+# --- Limpiar release anterior ---
+if (Test-Path $release) {
+    # Borrar solo el JAR anterior para evitar problemas si la carpeta está abierta
+    if (Test-Path $fatJar) { Remove-Item $fatJar -Force }
+} else {
+    New-Item -ItemType Directory -Path $release | Out-Null
 }
 
-# --- Escribir el MANIFEST correcto ---
-$manifest = "Manifest-Version: 1.0`r`nMain-Class: com.practicas.view.Main`r`nBuilt-By: GestionPracticas`r`n`r`n"
-Set-Content -Path "$manifestDir\MANIFEST.MF" -Value $manifest -NoNewline
+Add-Type -AssemblyName System.IO.Compression
+Add-Type -AssemblyName System.IO.Compression.FileSystem
 
-# --- Empaquetar todo en el fat JAR ---
-Write-Host "  Empaquetando fat JAR..."
-[System.IO.Compression.ZipFile]::CreateFromDirectory($tmp, $fatJar)
+# --- Construir el fat JAR copiando entradas ZIP directamente en memoria ---
+Write-Host "  Construyendo fat JAR..."
 
-# --- Copiar archivos de la release ---
+$fatStream   = [System.IO.File]::Open($fatJar, [System.IO.FileMode]::Create)
+$fatArchive  = New-Object System.IO.Compression.ZipArchive($fatStream, [System.IO.Compression.ZipArchiveMode]::Create)
+
+$entradas = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)
+
+function Copiar-Zip($zipPath, $esDriver) {
+    $stream  = [System.IO.File]::OpenRead($zipPath)
+    $archive = New-Object System.IO.Compression.ZipArchive($stream, [System.IO.Compression.ZipArchiveMode]::Read)
+
+    foreach ($entry in $archive.Entries) {
+        # Saltar el MANIFEST del driver; usaremos el del proyecto
+        if ($esDriver -and $entry.FullName -eq "META-INF/MANIFEST.MF") { continue }
+        # Saltar directorios vacíos y duplicados
+        if ($entry.FullName.EndsWith("/")) { continue }
+        if ($entradas.Contains($entry.FullName)) { continue }
+
+        $entradas.Add($entry.FullName) | Out-Null
+
+        $nuevaEntrada = $fatArchive.CreateEntry($entry.FullName, [System.IO.Compression.CompressionLevel]::Fastest)
+        $srcStream    = $entry.Open()
+        $dstStream    = $nuevaEntrada.Open()
+        $srcStream.CopyTo($dstStream)
+        $dstStream.Close()
+        $srcStream.Close()
+    }
+
+    $archive.Dispose()
+    $stream.Dispose()
+}
+
+# Primero el driver (sus entradas van primero, excepto el MANIFEST)
+Copiar-Zip "$lib\ojdbc17.jar" $true
+
+# Luego el JAR del proyecto (sobreescribe con su MANIFEST)
+Copiar-Zip $dist $false
+
+$fatArchive.Dispose()
+$fatStream.Dispose()
+
 Write-Host "  Copiando archivos..."
 Copy-Item "$base\config.properties" "$release\config.properties"
 
@@ -76,16 +98,19 @@ if (Test-Path "$base\MANUAL_USUARIO.md") {
     Copy-Item "$base\MANUAL_USUARIO.md" "$release\MANUAL_USUARIO.md"
 }
 
-# --- Crear lanzador Windows ---
-$bat = "@echo off`r`njava -jar GestionPracticasDesktop.jar`r`nif %ERRORLEVEL% NEQ 0 (`r`n    echo.`r`n    echo Error al iniciar. Verifique que Java 17 o superior este instalado.`r`n    pause`r`n)`r`n"
-Set-Content -Path "$release\iniciar.bat" -Value $bat -NoNewline
+# --- Lanzador Windows ---
+Set-Content -Path "$release\iniciar.bat" -Encoding ASCII -Value "@echo off`r`njava -jar GestionPracticasDesktop.jar`r`nif %ERRORLEVEL% NEQ 0 (`r`n    echo.`r`n    echo Error al iniciar. Verifique que Java 17 o superior este instalado.`r`n    pause`r`n)"
 
-# --- Crear lanzador Linux/macOS ---
-$sh = "#!/bin/bash`njava -jar GestionPracticasDesktop.jar`n"
-Set-Content -Path "$release\iniciar.sh" -Value $sh -NoNewline
+# --- Lanzador Linux/macOS ---
+Set-Content -Path "$release\iniciar.sh" -Encoding UTF8 -Value "#!/bin/bash`njava -jar GestionPracticasDesktop.jar`n"
 
-# --- Limpiar temporal ---
-Remove-Item $tmp -Recurse -Force
+# --- Verificar el JAR generado ---
+Write-Host "  Verificando JAR..."
+$verificacion = java -jar $fatJar --version 2>&1
+# No importa el resultado, solo que no diga "corrupt"
+if ($verificacion -match "corrupt") {
+    Write-Host "ADVERTENCIA: El JAR puede estar corrupto." -ForegroundColor Yellow
+}
 
 # --- Resultado ---
 Write-Host ""

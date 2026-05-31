@@ -109,7 +109,6 @@ public class FrmLogin extends JFrame {
 
     private void login() {
         try {
-            // Reconectar con la configuracion actual por si cambio antes del login
             Connection con =
                 com.practicas.util.DatabaseConnection.getConnection("GestionP", "GestionP");
             authService = new AuthService(con);

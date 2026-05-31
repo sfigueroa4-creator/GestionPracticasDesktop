@@ -24,7 +24,6 @@ public class PnlPracticas extends JPanel {
     private JTextField txtHoras;
     private FrmPrincipal frmPrincipal;
 
-    // DIRECTOR y ADMIN pueden escribir; COORDINADOR solo lee
     private static boolean puedeEscribir(Usuario u) {
         if (u == null) return false;
         return u.getRol() == RolUsuario.ADMIN
@@ -67,7 +66,6 @@ public class PnlPracticas extends JPanel {
         formulario.add(btnActualizar);
         formulario.add(btnEliminar);
 
-        // Deshabilitar controles de escritura si el rol no lo permite
         txtNombre.setEditable(escritura);
         txtNumero.setEditable(escritura);
         txtHoras.setEditable(escritura);

@@ -67,7 +67,6 @@ public class FrmPrincipal extends JFrame {
 
         RolUsuario rol = usuarioActual.getRol();
 
-        // Usuarios — solo ADMIN
         if (rol == RolUsuario.ADMIN) {
             pnlUsuarios = new PnlUsuarios(this);
             panelContenido.add(pnlUsuarios, "usuarios");
@@ -75,8 +74,7 @@ public class FrmPrincipal extends JFrame {
             panelMenu.add(btn);
             btn.addActionListener(e -> mostrarPanel("usuarios"));
         }
-
-        // Practicas — ADMIN, DIRECTOR, COORDINADOR
+        
         if (rol == RolUsuario.ADMIN || rol == RolUsuario.DIRECTOR
                 || rol == RolUsuario.COORDINADOR) {
             pnlPracticas = new PnlPracticas(this);
@@ -86,7 +84,6 @@ public class FrmPrincipal extends JFrame {
             btn.addActionListener(e -> mostrarPanel("practicas"));
         }
 
-        // Instituciones — ADMIN, DIRECTOR, COORDINADOR
         if (rol == RolUsuario.ADMIN || rol == RolUsuario.DIRECTOR
                 || rol == RolUsuario.COORDINADOR) {
             pnlInstituciones = new PnlInstituciones(this);
@@ -96,7 +93,6 @@ public class FrmPrincipal extends JFrame {
             btn.addActionListener(e -> mostrarPanel("instituciones"));
         }
 
-        // Grupos — ADMIN, DIRECTOR, COORDINADOR, DOCENTE
         if (rol == RolUsuario.ADMIN || rol == RolUsuario.DIRECTOR
                 || rol == RolUsuario.COORDINADOR || rol == RolUsuario.DOCENTE) {
             pnlGrupos = new PnlGrupos(conn, this);
@@ -106,7 +102,6 @@ public class FrmPrincipal extends JFrame {
             btn.addActionListener(e -> mostrarPanel("grupos"));
         }
 
-        // Inscripciones — todos excepto INSTITUCION
         if (rol != RolUsuario.INSTITUCION) {
             pnlInscripciones = new PnlInscripciones(usuarioActual);
             panelContenido.add(pnlInscripciones, "inscripciones");
@@ -115,7 +110,6 @@ public class FrmPrincipal extends JFrame {
             btn.addActionListener(e -> mostrarPanel("inscripciones"));
         }
 
-        // Configuracion BD — solo ADMIN
         if (rol == RolUsuario.ADMIN) {
             JButton btn = crearBoton("Configuracion BD");
             panelMenu.add(btn);

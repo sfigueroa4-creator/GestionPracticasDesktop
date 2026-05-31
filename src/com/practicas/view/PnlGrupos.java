@@ -30,7 +30,6 @@ public class PnlGrupos extends JPanel {
     private JComboBox<InstitucionReceptora> cbInstitucion;
     private FrmPrincipal frmPrincipal;
 
-    // ADMIN, DIRECTOR y COORDINADOR pueden escribir; DOCENTE solo lee
     private static boolean puedeEscribir(Usuario u) {
         if (u == null) return false;
         return u.getRol() == RolUsuario.ADMIN
@@ -108,7 +107,6 @@ public class PnlGrupos extends JPanel {
         gbc.gridx = 1; gbc.gridy = y;
         formulario.add(btnGuardar, gbc);
 
-        // Deshabilitar controles de escritura si el rol no lo permite
         txtNombre.setEditable(escritura);
         txtCupo.setEditable(escritura);
         cbPractica.setEnabled(escritura);

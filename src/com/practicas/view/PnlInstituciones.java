@@ -23,7 +23,6 @@ public class PnlInstituciones extends JPanel {
     private InstitucionReceptoraDAO institucionDAO;
     private FrmPrincipal frmPrincipal;
 
-    // DIRECTOR y ADMIN pueden escribir; COORDINADOR solo lee
     private static boolean puedeEscribir(Usuario u) {
         if (u == null) return false;
         return u.getRol() == RolUsuario.ADMIN
@@ -68,7 +67,6 @@ public class PnlInstituciones extends JPanel {
         JButton btnGuardar = new JButton("Guardar");
         formulario.add(btnGuardar);
 
-        // Deshabilitar controles de escritura si el rol no lo permite
         txtNombre.setEditable(escritura);
         txtNit.setEditable(escritura);
         txtTelefono.setEditable(escritura);
