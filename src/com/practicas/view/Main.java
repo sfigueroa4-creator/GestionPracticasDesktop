@@ -5,15 +5,14 @@
  */
 package com.practicas.view;
 
-import com.practicas.service.AuthService;
-import com.practicas.service.PracticaService;
 
 public class Main {
 
-    public static void main(String[] args) {
-        
-        javax.swing.SwingUtilities.invokeLater(() -> {
-            new FrmPrincipal().setVisible(true);
-        });
+public static void main(String[] args) {
+
+    javax.swing.SwingUtilities.invokeLater(() -> {
+        new FrmLogin().setVisible(true);
+    });
+
 }
 }

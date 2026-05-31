@@ -10,6 +10,7 @@ package com.practicas.model;
  * @author ASUS
  */
 public enum RolUsuario {
+    ADMIN,
     DIRECTOR,
     COORDINADOR,
     DOCENTE,

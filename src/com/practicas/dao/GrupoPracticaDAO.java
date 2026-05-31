@@ -21,58 +21,43 @@ public class GrupoPracticaDAO {
     // =========================
     // INSERTAR
     // =========================
-    public void insertar(GrupoPractica g) throws SQLException {
+public void insertar(GrupoPractica g) throws SQLException {
 
-        if (g == null) {
+    String sql = """
+        INSERT INTO GRUPO_PRACTICA
+        (NOMBRE, ID_PRACTICA,
+         ID_DOCENTE, ID_INSTITUCION,
+         CUPO_MAXIMO, OBSERVACIONES)
+        VALUES (?, ?, ?, ?, ?, ?)
+    """;
 
-            throw new SQLException(
-                "El grupo es null"
-            );
-        }
+    PreparedStatement ps = conn.prepareStatement(sql);
 
-        String sql = """
-            INSERT INTO GRUPO_PRACTICA
-            (ID_GRUPO, NOMBRE, ID_PRACTICA,
-             ID_DOCENTE, ID_INSTITUCION,
-             CUPO_MAXIMO, OBSERVACIONES)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-        """;
+    ps.setString(1, g.getNombre());
 
-        try (PreparedStatement ps =
-                 conn.prepareStatement(sql)) {
+    ps.setInt(2,
+        g.getPractica().getIdPractica()
+    );
 
-            ps.setInt(1, g.getIdGrupo());
+    ps.setInt(3,
+        g.getDocenteAsesor().getIdUsuario()
+    );
 
-            ps.setString(2, g.getNombre());
+    ps.setInt(4,
+        g.getInstitucion().getIdInstitucion()
+    );
 
-            ps.setInt(
-                3,
-                g.getPractica() != null
-                    ? g.getPractica().getIdPractica()
-                    : 0
-            );
+    ps.setInt(5,
+        g.getCupoMaximo()
+    );
 
-            ps.setInt(
-                4,
-                g.getDocenteAsesor() != null
-                    ? g.getDocenteAsesor().getIdUsuario()
-                    : 0
-            );
+    ps.setString(6,
+        g.getObservaciones()
+    );
 
-            ps.setInt(
-                5,
-                g.getInstitucion() != null
-                    ? g.getInstitucion().getIdInstitucion()
-                    : 0
-            );
-
-            ps.setInt(6, g.getCupoMaximo());
-
-            ps.setString(7, g.getObservaciones());
-
-            ps.executeUpdate();
-        }
-    }
+    ps.executeUpdate();
+    ps.close();
+}
 
     // =========================
     // LISTAR

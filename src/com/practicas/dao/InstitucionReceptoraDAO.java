@@ -21,34 +21,42 @@ public class InstitucionReceptoraDAO {
     // =========================
     // CREATE
     // =========================
-    public void insertar(InstitucionReceptora i) throws SQLException {
+   public void insertar(InstitucionReceptora i) throws SQLException {
 
-        String sql = """
-            INSERT INTO INSTITUCION_RECEPTORA
-            (ID_INSTITUCION, NOMBRE, NIT, DIRECCION, MUNICIPIO,
-             DEPARTAMENTO, TELEFONO, EMAIL_CONTACTO, CONVENIO_ACTIVO, FECHA_CONVENIO)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """;
+    String sql = """
+        INSERT INTO INSTITUCION_RECEPTORA
+        (NOMBRE, NIT, DIRECCION, MUNICIPIO,
+         DEPARTAMENTO, TELEFONO,
+         EMAIL_CONTACTO, CONVENIO_ACTIVO,
+         FECHA_CONVENIO)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    """;
 
-        PreparedStatement ps = conn.prepareStatement(sql);
+    PreparedStatement ps = conn.prepareStatement(sql);
 
-        ps.setInt(1, i.getIdInstitucion());
-        ps.setString(2, i.getNombre());
-        ps.setString(3, i.getNit());
-        ps.setString(4, i.getDireccion());
-        ps.setString(5, i.getMunicipio());
-        ps.setString(6, i.getDepartamento());
-        ps.setString(7, i.getTelefono());
-        ps.setString(8, i.getEmailContacto());
+    ps.setString(1, i.getNombre());
+    ps.setString(2, i.getNit());
+    ps.setString(3, i.getDireccion());
+    ps.setString(4, i.getMunicipio());
+    ps.setString(5, i.getDepartamento());
+    ps.setString(6, i.getTelefono());
+    ps.setString(7, i.getEmailContacto());
 
-        ps.setInt(9, i.isConvenioActivo() ? 1 : 0);
-        ps.setDate(10, i.getFechaConvenio() != null
-                ? Date.valueOf(i.getFechaConvenio())
-                : null);
+    ps.setInt(8,
+        i.isConvenioActivo() ? 1 : 0
+    );
 
-        ps.executeUpdate();
-        ps.close();
-    }
+    ps.setDate(9,
+        i.getFechaConvenio() != null
+            ? java.sql.Date.valueOf(
+                i.getFechaConvenio()
+            )
+            : null
+    );
+
+    ps.executeUpdate();
+    ps.close();
+}
 
     public List<InstitucionReceptora> listar() throws SQLException {
 

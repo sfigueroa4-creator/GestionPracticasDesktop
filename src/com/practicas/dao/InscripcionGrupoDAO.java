@@ -21,28 +21,50 @@ public class InscripcionGrupoDAO {
     // =========================
     // CREATE (INSERT)
     // =========================
-    public void insertar(InscripcionGrupo i) throws SQLException {
+public void insertar(InscripcionGrupo i) throws SQLException {
 
-        String sql = """
-            INSERT INTO INSCRIPCION_GRUPO
-            (ID_INSCRIPCION, ID_ESTUDIANTE, ID_GRUPO, HORAS_CUMPLIDAS,
-             ESTADO, FECHA_INSCRIPCION, OBSERVACION_FINAL)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-        """;
+    String sql = """
+        INSERT INTO INSCRIPCION_GRUPO
+        (ID_ESTUDIANTE, ID_GRUPO,
+         HORAS_CUMPLIDAS, ESTADO,
+         FECHA_INSCRIPCION,
+         OBSERVACION_FINAL)
+        VALUES (?, ?, ?, ?, ?, ?)
+    """;
 
-        PreparedStatement ps = conn.prepareStatement(sql);
+    PreparedStatement ps = conn.prepareStatement(sql);
 
-        ps.setInt(1, i.getIdInscripcion());
-        ps.setInt(2, i.getEstudiante().getIdUsuario());
-        ps.setInt(3, i.getGrupo().getIdGrupo());
-        ps.setDouble(4, i.getHorasCumplidas());
-        ps.setString(5, i.getEstado().name());
-        ps.setTimestamp(6, Timestamp.valueOf(i.getFechaInscripcion()));
-        ps.setString(7, i.getObservacionFinal());
+    ps.setInt(1,
+        i.getEstudiante().getIdUsuario()
+    );
 
-        ps.executeUpdate();
-        ps.close();
-    }
+    ps.setInt(2,
+        i.getGrupo().getIdGrupo()
+    );
+
+    ps.setDouble(3,
+        i.getHorasCumplidas()
+    );
+
+    ps.setString(4,
+        i.getEstado().name()
+    );
+
+    ps.setTimestamp(5,
+        i.getFechaInscripcion() != null
+            ? Timestamp.valueOf(
+                i.getFechaInscripcion()
+            )
+            : null
+    );
+
+    ps.setString(6,
+        i.getObservacionFinal()
+    );
+
+    ps.executeUpdate();
+    ps.close();
+}
 
     // =========================
     // READ (LISTAR TODO)
