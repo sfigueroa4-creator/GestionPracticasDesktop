@@ -34,7 +34,7 @@ El sistema se conecta a una base de datos Oracle y está diseñado para ser usad
 | Componente | Requisito mínimo |
 |---|---|
 | Sistema operativo | Windows 10 o superior |
-| Java | JDK / JRE 15 o superior |
+| Java | JDK / JRE 17 o superior |
 | Base de datos | Oracle Database (XE o superior) |
 | Memoria RAM | 512 MB disponibles |
 | Espacio en disco | 50 MB |
@@ -53,9 +53,9 @@ java -version
 
 Antes de usar el sistema por primera vez es necesario apuntar la aplicación a su servidor Oracle.
 
-1. Inicie la aplicación (`GestionPracticasDesktop-full.jar`).
+1. Inicie la aplicación (`GestionPracticasDesktop.jar`).
 2. Inicie sesión con las credenciales de administrador (ver sección 4).
-3. En el menú lateral, haga clic en **Configuración BD**.
+3. En el menú lateral, haga clic en **Configuracion BD**.
 4. Introduzca los datos de conexión:
    - **Host**: dirección IP o nombre del servidor Oracle (por defecto `localhost`)
    - **Puerto**: puerto del listener Oracle (por defecto `1521`)
@@ -68,13 +68,13 @@ Antes de usar el sistema por primera vez es necesario apuntar la aplicación a s
 
 Si la base de datos está vacía o es una instalación nueva:
 
-1. Acceda a **Configuración BD** (requiere rol Administrador).
+1. Acceda a **Configuracion BD** (requiere rol Administrador).
 2. Haga clic en **Crear tablas**.
 3. El sistema creará todas las tablas necesarias e insertará el usuario administrador por defecto:
    - **Usuario:** `GestionP`
    - **Contraseña:** `GestionP`
 
-> **Importante:** cambie la contraseña del administrador por defecto tras el primer acceso registrando un nuevo usuario administrador.
+> **Importante:** cambie la contraseña del administrador por defecto tras el primer acceso usando la opción **Cambiar contrasena** en el módulo Usuarios.
 
 ---
 
@@ -104,9 +104,7 @@ El sistema cuenta con seis roles. Cada rol determina qué módulos son visibles 
 | Inscripciones | ✏️ | ✏️ | ✏️ | ✏️ | 👁 | 👁 |
 | Configuración BD | ✏️ | — | — | — | — | — |
 
-**✏️** = lectura y escritura  
-**👁** = solo lectura (ve los datos pero no puede crear ni modificar)  
-**—** = sin acceso (el módulo no aparece en el menú)
+**✏️** = lectura y escritura &nbsp;&nbsp; **👁** = solo lectura &nbsp;&nbsp; **—** = sin acceso
 
 ### Descripción de roles
 
@@ -125,7 +123,7 @@ El sistema cuenta con seis roles. Cada rol determina qué módulos son visibles 
 
 > Acceso exclusivo para **ADMIN**.
 
-Permite registrar las personas que usarán el sistema.
+Permite registrar y gestionar las personas que usarán el sistema.
 
 **Campos:**
 - **Nombre** — nombre del usuario
@@ -138,7 +136,13 @@ Permite registrar las personas que usarán el sistema.
 2. Seleccione el rol en el desplegable.
 3. Haga clic en **Guardar**.
 
-> La contraseña inicial de todos los usuarios creados es `123456`. Comuníquela al usuario para que la cambie en su primer acceso (funcionalidad de cambio de contraseña pendiente de implementar).
+> La contraseña inicial de todos los usuarios creados es `123456`. Comuníquela al usuario y cámbiela cuanto antes usando la opción descrita a continuación.
+
+**Para cambiar la contraseña de un usuario:**
+1. Haga clic sobre el usuario en la tabla — sus datos se cargarán en el formulario.
+2. Haga clic en **Cambiar contrasena**.
+3. Introduzca la nueva contraseña y confírmela en el diálogo que aparece.
+4. Haga clic en **OK**.
 
 La tabla inferior muestra todos los usuarios registrados con su nombre, apellido, email y rol.
 
@@ -237,7 +241,7 @@ La tabla muestra todas las inscripciones con el nombre del estudiante, el grupo 
 
 > Acceso exclusivo para **ADMIN**.
 
-Accesible desde el botón **Configuración BD** en el menú lateral.
+Accesible desde el botón **Configuracion BD** en el menú lateral.
 
 ### Guardar configuración de conexión
 
@@ -270,16 +274,16 @@ Los desplegables se cargan desde la base de datos al abrir el panel. Si están v
 Su rol no tiene permiso de escritura en ese módulo. Los campos y botones aparecerán deshabilitados. Consulte la tabla de roles en la sección 5.
 
 **Olvidé la contraseña de un usuario. ¿Cómo la recupero?**  
-Un administrador puede eliminar el usuario y crearlo de nuevo. La contraseña inicial será `123456`.
+Un administrador puede seleccionar el usuario en el módulo Usuarios y usar **Cambiar contrasena** para asignarle una nueva contraseña.
 
 **La aplicación muestra un error de conexión al iniciar.**  
-Verifique que el servidor Oracle esté en ejecución y que los datos de conexión en `config.properties` sean correctos. Acceda a **Configuración BD** para corregirlos.
+Verifique que el servidor Oracle esté en ejecución y que los datos de conexión en `config.properties` sean correctos. Acceda a **Configuracion BD** para corregirlos.
 
 **¿Puedo usar el sistema en varios equipos a la vez?**  
-Sí, siempre que todos los equipos apunten al mismo servidor Oracle. Cada equipo necesita el archivo `GestionPracticasDesktop-full.jar` y un `config.properties` con los datos del servidor compartido.
+Sí, siempre que todos los equipos apunten al mismo servidor Oracle. Cada equipo necesita el archivo `GestionPracticasDesktop.jar` y un `config.properties` con los datos del servidor compartido.
 
 **¿Qué hago si necesito reiniciar completamente la base de datos?**  
-Acceda a **Configuración BD** como administrador, haga clic en **Borrar tablas** y confirme las dos advertencias. Luego haga clic en **Crear tablas** para recrear la estructura con el usuario administrador por defecto (`GestionP` / `GestionP`).
+Acceda a **Configuracion BD** como administrador, haga clic en **Borrar tablas** y confirme las dos advertencias. Luego haga clic en **Crear tablas** para recrear la estructura con el usuario administrador por defecto (`GestionP` / `GestionP`).
 
 ---
 

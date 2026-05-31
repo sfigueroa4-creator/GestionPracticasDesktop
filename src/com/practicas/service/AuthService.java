@@ -43,4 +43,14 @@ public class AuthService {
         }
         return new ArrayList<>();
     }
+
+    public boolean cambiarPassword(int idUsuario, String nuevaPassword) {
+        try {
+            usuarioDAO.cambiarPassword(idUsuario, nuevaPassword);
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

@@ -78,6 +78,16 @@ public class UsuarioDAO {
         ps.close();
     }
 
+    public void cambiarPassword(int idUsuario, String nuevaPassword) throws SQLException {
+        PreparedStatement ps = conn.prepareStatement(
+            "UPDATE USUARIO SET PASSWORD_HASH = ? WHERE ID_USUARIO = ?"
+        );
+        ps.setString(1, nuevaPassword);
+        ps.setInt(2, idUsuario);
+        ps.executeUpdate();
+        ps.close();
+    }
+
     public void eliminar(int idUsuario) throws SQLException {
         PreparedStatement ps = conn.prepareStatement("DELETE FROM USUARIO WHERE ID_USUARIO = ?");
         ps.setInt(1, idUsuario);
