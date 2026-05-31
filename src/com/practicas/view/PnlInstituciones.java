@@ -7,6 +7,9 @@ package com.practicas.view;
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import com.practicas.dao.InstitucionReceptoraDAO;
+import com.practicas.model.InstitucionReceptora;
+
 
 public class PnlInstituciones extends JPanel {
 
@@ -16,11 +19,32 @@ public class PnlInstituciones extends JPanel {
     private JTextField txtNombre;
     private JTextField txtNit;
     private JTextField txtTelefono;
-
+    private InstitucionReceptoraDAO institucionDAO;
+    
     public PnlInstituciones() {
 
         setLayout(new BorderLayout());
+        try {
 
+    java.sql.Connection con =
+        com.practicas.util.DatabaseConnection
+            .getConnection(
+                "GestionP",
+                "GestionP",
+                "orcl"
+            );
+
+    institucionDAO =
+        new InstitucionReceptoraDAO(con);
+
+} catch (Exception e) {
+
+    JOptionPane.showMessageDialog(
+        this,
+        "Error conexión: " +
+        e.getMessage()
+    );
+}
         JPanel formulario = new JPanel(
                 new GridLayout(4,2,5,5)
         );
@@ -65,18 +89,83 @@ modelo = new DefaultTableModel() {
         add(new JScrollPane(tabla), BorderLayout.CENTER);
 
         btnGuardar.addActionListener(e -> guardarInstitucion());
+        cargarInstituciones();
     }
 
-    private void guardarInstitucion() {
+private void guardarInstitucion() {
+
+    try {
+
+        InstitucionReceptora i =
+            new InstitucionReceptora();
+
+        i.setNombre(
+            txtNombre.getText()
+        );
+
+        i.setNit(
+            txtNit.getText()
+        );
+
+        i.setTelefono(
+            txtTelefono.getText()
+        );
+
+        institucionDAO.insertar(i);
 
         modelo.addRow(new Object[] {
-            txtNombre.getText(),
-            txtNit.getText(),
-            txtTelefono.getText()
+
+            i.getNombre(),
+            i.getNit(),
+            i.getTelefono()
         });
 
+        JOptionPane.showMessageDialog(
+            this,
+            "Institución guardada"
+        );
+
         limpiar();
+
+    } catch (Exception e) {
+
+        JOptionPane.showMessageDialog(
+            this,
+            "Error: " +
+            e.getMessage()
+        );
     }
+}
+
+private void cargarInstituciones() {
+
+    try {
+
+        modelo.setRowCount(0);
+
+        for (
+            InstitucionReceptora i :
+            institucionDAO.listar()
+        ) {
+
+            modelo.addRow(
+                new Object[] {
+
+                    i.getNombre(),
+                    i.getNit(),
+                    i.getTelefono()
+                }
+            );
+        }
+
+    } catch (Exception e) {
+
+        JOptionPane.showMessageDialog(
+            this,
+            "Error cargando instituciones"
+        );
+    }
+}
 
     private void limpiar() {
 
