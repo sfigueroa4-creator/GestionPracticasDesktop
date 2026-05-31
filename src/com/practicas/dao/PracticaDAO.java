@@ -18,9 +18,6 @@ public class PracticaDAO {
         this.conn = conn;
     }
 
-    // =========================
-    // CREATE
-    // =========================
     public void insertar(Practica p) throws SQLException {
         
         if (p == null) {
@@ -65,9 +62,6 @@ public class PracticaDAO {
         ps.close();
     }
 
-    // =========================
-    // READ ALL
-    // =========================
     public List<Practica> listar() throws SQLException {
 
         List<Practica> lista = new ArrayList<>();
@@ -130,9 +124,6 @@ public class PracticaDAO {
         return lista;
     }
 
-    // =========================
-    // UPDATE
-    // =========================
     public void actualizar(Practica p) throws SQLException {
 
         String sql = """
@@ -171,9 +162,6 @@ public class PracticaDAO {
         }
     }
 
-    // =========================
-    // DELETE
-    // =========================
     public void eliminar(int idPractica) throws SQLException {
 
         String sql = "DELETE FROM PRACTICA WHERE ID_PRACTICA = ?";

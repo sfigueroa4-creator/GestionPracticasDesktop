@@ -31,7 +31,7 @@ public class PnlInstituciones extends JPanel {
             .getConnection(
                 "GestionP",
                 "GestionP",
-                "orcl"
+                "XEPDB1"
             );
 
     institucionDAO =

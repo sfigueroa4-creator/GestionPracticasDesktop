@@ -27,10 +27,13 @@ public class FrmLogin extends JFrame {
 
         setLayout(new BorderLayout());
 
-        // =========================
-        // CONEXIÓN
-        // =========================
+       ImageIcon icon = new ImageIcon(
+            getClass().getResource("/com/practicas/Img/IconProyecto.png")
+        );
 
+        setIconImage(icon.getImage());
+        setLayout(new BorderLayout());
+        
         try {
 
             Connection con =
@@ -38,7 +41,7 @@ public class FrmLogin extends JFrame {
                     .getConnection(
                         "GestionP",
                         "GestionP",
-                        "@//localhost:1521/XEPDB1"
+                        "XEPDB1"
                     );
 
             authService =
@@ -52,10 +55,6 @@ public class FrmLogin extends JFrame {
                 e.getMessage()
             );
         }
-
-        // =========================
-        // FORMULARIO
-        // =========================
 
         JPanel panel = new JPanel(
             new GridLayout(3,2,5,5)
@@ -79,10 +78,6 @@ public class FrmLogin extends JFrame {
         panel.add(btnLogin);
 
         add(panel, BorderLayout.CENTER);
-
-        // =========================
-        // EVENTO LOGIN
-        // =========================
 
         btnLogin.addActionListener(
             e -> login()

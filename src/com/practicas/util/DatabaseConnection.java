@@ -16,7 +16,7 @@ public class DatabaseConnection {
             String password,
             String servicio) throws SQLException {
 
-        String url = "jdbc:oracle:thin:@//localhost:1521/XEPDB1";
+        String url = "jdbc:oracle:thin:@//localhost:1521/"+servicio;
 
         return DriverManager.getConnection(url, usuario, password);
     }

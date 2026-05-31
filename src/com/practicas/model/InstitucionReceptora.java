@@ -103,4 +103,8 @@ public class InstitucionReceptora {
     public void setFechaConvenio(LocalDate fechaConvenio) {
         this.fechaConvenio = fechaConvenio;
     }
+    @Override
+    public String toString() {
+        return nombre;
+    }
 }

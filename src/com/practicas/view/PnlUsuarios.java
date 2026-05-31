@@ -27,17 +27,13 @@ public class PnlUsuarios extends JPanel {
 
         setLayout(new BorderLayout());
 
-        // =========================
-        // CONEXIÓN
-        // =========================
-
         try {
 
             java.sql.Connection con =
                 com.practicas.util.DatabaseConnection.getConnection(
                     "GestionP",
                     "GestionP",
-                    "orcl"
+                    "XEPDB1"
                 );
 
             authService = new AuthService(con);
@@ -49,10 +45,6 @@ public class PnlUsuarios extends JPanel {
                 "Error de conexión: " + e.getMessage()
             );
         }
-
-        // =========================
-        // FORMULARIO
-        // =========================
 
         JPanel panelFormulario = new JPanel();
 
@@ -79,10 +71,6 @@ public class PnlUsuarios extends JPanel {
 
         add(panelFormulario, BorderLayout.NORTH);
 
-        // =========================
-        // TABLA
-        // =========================
-
 modelo = new DefaultTableModel() {
 
     @Override
@@ -105,17 +93,10 @@ modelo = new DefaultTableModel() {
 
         add(scroll, BorderLayout.CENTER);
 
-        // =========================
-        // EVENTO
-        // =========================
 
         btnGuardar.addActionListener(
             e -> guardarUsuario()
         );
-
-        // =========================
-        // CARGAR DATOS
-        // =========================
 
         cargarUsuarios();
     }

@@ -7,11 +7,10 @@ package com.practicas.service;
 
 import com.practicas.dao.PracticaDAO;
 import com.practicas.model.Practica;
-import java.util.ArrayList;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-
+import java.util.ArrayList;
 import java.util.List;
 
 public class PracticaService {
@@ -19,96 +18,79 @@ public class PracticaService {
     private PracticaDAO practicaDAO;
 
     public PracticaService(Connection conn) {
-
         practicaDAO = new PracticaDAO(conn);
     }
 
-    public void crearPractica(Practica practica) {
+    // CREATE
+    public void crearPractica(Practica practica) throws Exception {
 
-        if (practica.getNombre() == null ||
-            practica.getNombre().isEmpty()) {
+        validarPractica(practica);
 
-            System.out.println(
-                "Error: nombre obligatorio."
-            );
-
-            return;
-        }
-
-        if (practica.getNumeroPractica() < 1 ||
-            practica.getNumeroPractica() > 8) {
-
-            System.out.println(
-                "Error: número inválido."
-            );
-
-            return;
-        }
-
-        try {
-
-            practicaDAO.insertar(practica);
-
-            System.out.println(
-                "Práctica registrada correctamente."
-            );
-
-        } catch (SQLException e) {
-
-            e.printStackTrace();
-        }
+        practicaDAO.insertar(practica);
     }
 
-    public void mostrarPracticas() {
-
+    // READ
+    public List<Practica> obtenerPracticas() {
         try {
-
-            List<Practica> lista =
-                practicaDAO.listar();
-
-            for (Practica p : lista) {
-
-                System.out.println(
-                    p.getNombre()
-                );
-            }
-
+            return practicaDAO.listar();
         } catch (SQLException e) {
-
             e.printStackTrace();
         }
+
+        return new ArrayList<>();
     }
 
     public Practica buscarPractica(int numero) {
-
         try {
-
-            for (Practica p :
-                    practicaDAO.listar()) {
-
+            for (Practica p : practicaDAO.listar()) {
                 if (p.getNumeroPractica() == numero) {
                     return p;
                 }
             }
-
         } catch (SQLException e) {
-
             e.printStackTrace();
         }
 
         return null;
     }
-    public List<Practica> obtenerPracticas() {
 
-    try {
+    // UPDATE
+    public void actualizarPractica(Practica practica) throws Exception {
 
-        return practicaDAO.listar();
+        validarPractica(practica);
 
-    } catch (SQLException e) {
-
-        e.printStackTrace();
+        practicaDAO.actualizar(practica);
     }
 
-    return new ArrayList<>();
-}
+    // DELETE
+    public void eliminarPractica(int idPractica) throws Exception {
+        practicaDAO.eliminar(idPractica);
+    }
+
+    // VALIDACIONES
+    private void validarPractica(Practica practica) throws Exception {
+
+        if (practica.getNombre() == null ||
+            practica.getNombre().trim().isEmpty()) {
+
+            throw new Exception(
+                "El nombre es obligatorio"
+            );
+        }
+
+        if (practica.getNumeroPractica() < 1 ||
+            practica.getNumeroPractica() > 8) {
+
+            throw new Exception(
+                "El número debe estar entre 1 y 8"
+            );
+        }
+
+        if (practica.getHorasReglamentarias() <= 0) {
+
+            throw new Exception(
+                "Las horas deben ser mayores que 0"
+            );
+        }
+    }
 }

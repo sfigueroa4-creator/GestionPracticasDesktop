@@ -118,4 +118,8 @@ public class Practica {
     public void setFechaCreacion(LocalDateTime fechaCreacion) {
         this.fechaCreacion = fechaCreacion;
     }
+    @Override
+    public String toString() {
+        return nombre;
+    }
 }
