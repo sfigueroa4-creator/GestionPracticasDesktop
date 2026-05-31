@@ -5,3 +5,8 @@
 *.jar
 
 /nbproject/private/
+
+# Driver OJDBC (no se incluye por licencia de Oracle)
+# Descarga ojdbc17.jar desde https://www.oracle.com/database/technologies/appdev/jdbc-downloads.html
+# y colócalo en lib/ antes de compilar.
+/lib/

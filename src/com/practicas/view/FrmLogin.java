@@ -56,37 +56,6 @@ public class FrmLogin extends JFrame {
             );
         }
 
-        JButton btnConfig =
-            new JButton("⚙");
-
-        JPanel panelSuperior =
-            new JPanel(
-                new FlowLayout(
-                    FlowLayout.RIGHT
-                )
-            );
-
-        panelSuperior.add(
-            btnConfig
-        );
-
-        add(
-            panelSuperior,
-            BorderLayout.NORTH
-        );
-
-        btnConfig.addActionListener(
-            e -> {
-
-                FrmConfiguracionBD frm =
-                    new FrmConfiguracionBD(
-                        this
-                    );
-
-                frm.setVisible(true);
-            }
-        );
-
         JPanel panel =
             new JPanel(
                 new GridLayout(
@@ -167,7 +136,7 @@ public class FrmLogin extends JFrame {
                 );
 
                 FrmPrincipal frm =
-                    new FrmPrincipal();
+                    new FrmPrincipal(usuario);
 
                 frm.setVisible(true);
 

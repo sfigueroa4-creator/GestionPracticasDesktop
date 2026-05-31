@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.practicas.dao;
 
 import com.practicas.model.GrupoPractica;
@@ -18,141 +14,59 @@ public class GrupoPracticaDAO {
         this.conn = conn;
     }
 
-public void insertar(GrupoPractica g) throws SQLException {
-
-    String sql = """
-        INSERT INTO GRUPO_PRACTICA
-        (NOMBRE, ID_PRACTICA,
-         ID_DOCENTE, ID_INSTITUCION,
-         CUPO_MAXIMO, OBSERVACIONES)
-        VALUES (?, ?, ?, ?, ?, ?)
-    """;
-    if (g == null ||
-    g.getPractica() == null ||
-    g.getDocenteAsesor() == null ||
-    g.getInstitucion() == null) {
-
-    throw new SQLException("Datos incompletos");
-}
-    PreparedStatement ps = conn.prepareStatement(sql);
-
-    ps.setString(1, g.getNombre());
-
-    ps.setInt(2,
-        g.getPractica().getIdPractica()
-    );
-
-    ps.setInt(3,
-        g.getDocenteAsesor().getIdUsuario()
-    );
-
-    ps.setInt(4,
-        g.getInstitucion().getIdInstitucion()
-    );
-
-    ps.setInt(5,
-        g.getCupoMaximo()
-    );
-
-    ps.setString(6,
-        g.getObservaciones()
-    );
-
-    ps.executeUpdate();
-    ps.close();
-}
-
-    public List<GrupoPractica> listar()
-            throws SQLException {
-
-        List<GrupoPractica> lista =
-            new ArrayList<>();
-
+    public void insertar(GrupoPractica g) throws SQLException {
+        if (g == null || g.getPractica() == null || g.getDocenteAsesor() == null || g.getInstitucion() == null)
+            throw new SQLException("Datos incompletos");
         String sql = """
-            SELECT
-                ID_GRUPO,
-                NOMBRE,
-                CUPO_MAXIMO,
-                OBSERVACIONES
-            FROM GRUPO_PRACTICA
+            INSERT INTO GRUPO_PRACTICA
+            (NOMBRE, ID_PRACTICA, ID_DOCENTE, ID_INSTITUCION, CUPO_MAXIMO, OBSERVACIONES)
+            VALUES (?, ?, ?, ?, ?, ?)
         """;
+        PreparedStatement ps = conn.prepareStatement(sql);
+        ps.setString(1, g.getNombre());
+        ps.setInt(2, g.getPractica().getIdPractica());
+        ps.setInt(3, g.getDocenteAsesor().getIdUsuario());
+        ps.setInt(4, g.getInstitucion().getIdInstitucion());
+        ps.setInt(5, g.getCupoMaximo());
+        ps.setString(6, g.getObservaciones());
+        ps.executeUpdate();
+        ps.close();
+    }
 
-        try (PreparedStatement ps =
-                 conn.prepareStatement(sql);
-
-             ResultSet rs =
-                 ps.executeQuery()) {
-
+    public List<GrupoPractica> listar() throws SQLException {
+        List<GrupoPractica> lista = new ArrayList<>();
+        String sql = "SELECT ID_GRUPO, NOMBRE, CUPO_MAXIMO, OBSERVACIONES FROM GRUPO_PRACTICA";
+        try (PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
-
-                GrupoPractica g =
-                    new GrupoPractica();
-
-                g.setIdGrupo(
-                    rs.getInt("ID_GRUPO")
-                );
-
-                g.setNombre(
-                    rs.getString("NOMBRE")
-                );
-
-                g.setCupoMaximo(
-                    rs.getInt("CUPO_MAXIMO")
-                );
-
-                g.setObservaciones(
-                    rs.getString("OBSERVACIONES")
-                );
-
+                GrupoPractica g = new GrupoPractica();
+                g.setIdGrupo(rs.getInt("ID_GRUPO"));
+                g.setNombre(rs.getString("NOMBRE"));
+                g.setCupoMaximo(rs.getInt("CUPO_MAXIMO"));
+                g.setObservaciones(rs.getString("OBSERVACIONES"));
                 lista.add(g);
             }
         }
-
         return lista;
     }
 
-    public void actualizar(GrupoPractica g)
-            throws SQLException {
-
+    public void actualizar(GrupoPractica g) throws SQLException {
         String sql = """
             UPDATE GRUPO_PRACTICA
-            SET NOMBRE = ?,
-                CUPO_MAXIMO = ?,
-                OBSERVACIONES = ?
+            SET NOMBRE = ?, CUPO_MAXIMO = ?, OBSERVACIONES = ?
             WHERE ID_GRUPO = ?
         """;
-
-        try (PreparedStatement ps =
-                 conn.prepareStatement(sql)) {
-
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, g.getNombre());
-
             ps.setInt(2, g.getCupoMaximo());
-
-            ps.setString(
-                3,
-                g.getObservaciones()
-            );
-
+            ps.setString(3, g.getObservaciones());
             ps.setInt(4, g.getIdGrupo());
-
             ps.executeUpdate();
         }
     }
 
-    public void eliminar(int idGrupo)
-            throws SQLException {
-
-        String sql = """
-            DELETE FROM GRUPO_PRACTICA
-            WHERE ID_GRUPO = ?
-        """;
-
-        try (PreparedStatement ps =
-                 conn.prepareStatement(sql)) {
-
+    public void eliminar(int idGrupo) throws SQLException {
+        try (PreparedStatement ps = conn.prepareStatement("DELETE FROM GRUPO_PRACTICA WHERE ID_GRUPO = ?")) {
             ps.setInt(1, idGrupo);
-
             ps.executeUpdate();
         }
     }

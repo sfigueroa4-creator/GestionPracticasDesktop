@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.practicas.model;
 
 import java.time.LocalDate;
@@ -20,91 +15,38 @@ public class InstitucionReceptora {
     private boolean convenioActivo;
     private LocalDate fechaConvenio;
 
-    public InstitucionReceptora() {
-    }
+    public InstitucionReceptora() {}
 
+    public int getIdInstitucion() { return idInstitucion; }
+    public void setIdInstitucion(int idInstitucion) { this.idInstitucion = idInstitucion; }
 
-    public int getIdInstitucion() {
-        return idInstitucion;
-    }
+    public String getNombre() { return nombre; }
+    public void setNombre(String nombre) { this.nombre = nombre; }
 
-    public void setIdInstitucion(int idInstitucion) {
-        this.idInstitucion = idInstitucion;
-    }
+    public String getNit() { return nit; }
+    public void setNit(String nit) { this.nit = nit; }
 
-    public String getNombre() {
-        return nombre;
-    }
+    public String getDireccion() { return direccion; }
+    public void setDireccion(String direccion) { this.direccion = direccion; }
 
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
+    public String getMunicipio() { return municipio; }
+    public void setMunicipio(String municipio) { this.municipio = municipio; }
 
-    public String getNit() {
-        return nit;
-    }
+    public String getDepartamento() { return departamento; }
+    public void setDepartamento(String departamento) { this.departamento = departamento; }
 
-    public void setNit(String nit) {
-        this.nit = nit;
-    }
+    public String getTelefono() { return telefono; }
+    public void setTelefono(String telefono) { this.telefono = telefono; }
 
-    public String getDireccion() {
-        return direccion;
-    }
+    public String getEmailContacto() { return emailContacto; }
+    public void setEmailContacto(String emailContacto) { this.emailContacto = emailContacto; }
 
-    public void setDireccion(String direccion) {
-        this.direccion = direccion;
-    }
+    public boolean isConvenioActivo() { return convenioActivo; }
+    public void setConvenioActivo(boolean convenioActivo) { this.convenioActivo = convenioActivo; }
 
-    public String getMunicipio() {
-        return municipio;
-    }
+    public LocalDate getFechaConvenio() { return fechaConvenio; }
+    public void setFechaConvenio(LocalDate fechaConvenio) { this.fechaConvenio = fechaConvenio; }
 
-    public void setMunicipio(String municipio) {
-        this.municipio = municipio;
-    }
-
-    public String getDepartamento() {
-        return departamento;
-    }
-
-    public void setDepartamento(String departamento) {
-        this.departamento = departamento;
-    }
-
-    public String getTelefono() {
-        return telefono;
-    }
-
-    public void setTelefono(String telefono) {
-        this.telefono = telefono;
-    }
-
-    public String getEmailContacto() {
-        return emailContacto;
-    }
-
-    public void setEmailContacto(String emailContacto) {
-        this.emailContacto = emailContacto;
-    }
-
-    public boolean isConvenioActivo() {
-        return convenioActivo;
-    }
-
-    public void setConvenioActivo(boolean convenioActivo) {
-        this.convenioActivo = convenioActivo;
-    }
-
-    public LocalDate getFechaConvenio() {
-        return fechaConvenio;
-    }
-
-    public void setFechaConvenio(LocalDate fechaConvenio) {
-        this.fechaConvenio = fechaConvenio;
-    }
     @Override
-    public String toString() {
-        return nombre;
-    }
+    public String toString() { return nombre; }
 }

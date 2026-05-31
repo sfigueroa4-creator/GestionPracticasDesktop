@@ -9,13 +9,23 @@ import javax.swing.*;
 import java.sql.Connection;
 import java.sql.SQLException;
 import com.practicas.util.DatabaseConnection;
+import com.practicas.model.Usuario;
+import com.practicas.model.RolUsuario;
 
 public class FrmPrincipal extends JFrame {
 
     private JPanel panelContenido;
     private Connection conn;
+    private Usuario usuarioActual;
 
-    public FrmPrincipal() {
+    private PnlUsuarios pnlUsuarios;
+    private PnlPracticas pnlPracticas;
+    private PnlInstituciones pnlInstituciones;
+    private PnlGrupos pnlGrupos;
+    private PnlInscripciones pnlInscripciones;
+
+    public FrmPrincipal(Usuario usuario) {
+        this.usuarioActual = usuario;
 
         try {
             conn = DatabaseConnection.getConnection(
@@ -25,12 +35,13 @@ public class FrmPrincipal extends JFrame {
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(
                     null,
-                    "Error de conexión: " + e.getMessage()
+                    "Error de conexion: " + e.getMessage()
             );
             return;
         }
 
-        setTitle("Sistema de Gestión de Prácticas");
+        setTitle("Gestion de Practicas  " + usuario.getNombreCompleto()
+                + " [" + usuario.getRol().name() + "]");
         setSize(1000, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -38,7 +49,6 @@ public class FrmPrincipal extends JFrame {
         ImageIcon icon = new ImageIcon(
                 getClass().getResource("/com/practicas/Img/IconProyecto.png")
         );
-
         setIconImage(icon.getImage());
         setLayout(new BorderLayout());
 
@@ -50,35 +60,90 @@ public class FrmPrincipal extends JFrame {
                 BorderFactory.createEmptyBorder(20, 15, 20, 15)
         );
 
-        JButton btnUsuarios = crearBoton("Usuarios");
-        JButton btnPracticas = crearBoton("Prácticas");
-        JButton btnInstituciones = crearBoton("Instituciones");
-        JButton btnGrupos = crearBoton("Grupos");
-        JButton btnInscripciones = crearBoton("Inscripciones");
-
-        panelMenu.add(btnUsuarios);
-        panelMenu.add(btnPracticas);
-        panelMenu.add(btnInstituciones);
-        panelMenu.add(btnGrupos);
-        panelMenu.add(btnInscripciones);
-
         add(panelMenu, BorderLayout.WEST);
 
         panelContenido = new JPanel(new CardLayout());
-
-        panelContenido.add(new PnlUsuarios(), "usuarios");
-        panelContenido.add(new PnlPracticas(), "practicas");
-        panelContenido.add(new PnlInstituciones(), "instituciones");
-        panelContenido.add(new PnlGrupos(conn), "grupos");
-        panelContenido.add(new PnlInscripciones(), "inscripciones");
-
         add(panelContenido, BorderLayout.CENTER);
 
-        btnUsuarios.addActionListener(e -> mostrarPanel("usuarios"));
-        btnPracticas.addActionListener(e -> mostrarPanel("practicas"));
-        btnInstituciones.addActionListener(e -> mostrarPanel("instituciones"));
-        btnGrupos.addActionListener(e -> mostrarPanel("grupos"));
-        btnInscripciones.addActionListener(e -> mostrarPanel("inscripciones"));
+        RolUsuario rol = usuarioActual.getRol();
+
+        // Usuarios — solo ADMIN
+        if (rol == RolUsuario.ADMIN) {
+            pnlUsuarios = new PnlUsuarios(this);
+            panelContenido.add(pnlUsuarios, "usuarios");
+            JButton btn = crearBoton("Usuarios");
+            panelMenu.add(btn);
+            btn.addActionListener(e -> mostrarPanel("usuarios"));
+        }
+
+        // Practicas — ADMIN, DIRECTOR, COORDINADOR
+        if (rol == RolUsuario.ADMIN || rol == RolUsuario.DIRECTOR
+                || rol == RolUsuario.COORDINADOR) {
+            pnlPracticas = new PnlPracticas(this);
+            panelContenido.add(pnlPracticas, "practicas");
+            JButton btn = crearBoton("Practicas");
+            panelMenu.add(btn);
+            btn.addActionListener(e -> mostrarPanel("practicas"));
+        }
+
+        // Instituciones — ADMIN, DIRECTOR, COORDINADOR
+        if (rol == RolUsuario.ADMIN || rol == RolUsuario.DIRECTOR
+                || rol == RolUsuario.COORDINADOR) {
+            pnlInstituciones = new PnlInstituciones(this);
+            panelContenido.add(pnlInstituciones, "instituciones");
+            JButton btn = crearBoton("Instituciones");
+            panelMenu.add(btn);
+            btn.addActionListener(e -> mostrarPanel("instituciones"));
+        }
+
+        // Grupos — ADMIN, DIRECTOR, COORDINADOR, DOCENTE
+        if (rol == RolUsuario.ADMIN || rol == RolUsuario.DIRECTOR
+                || rol == RolUsuario.COORDINADOR || rol == RolUsuario.DOCENTE) {
+            pnlGrupos = new PnlGrupos(conn, this);
+            panelContenido.add(pnlGrupos, "grupos");
+            JButton btn = crearBoton("Grupos");
+            panelMenu.add(btn);
+            btn.addActionListener(e -> mostrarPanel("grupos"));
+        }
+
+        // Inscripciones — todos excepto INSTITUCION
+        if (rol != RolUsuario.INSTITUCION) {
+            pnlInscripciones = new PnlInscripciones(usuarioActual);
+            panelContenido.add(pnlInscripciones, "inscripciones");
+            JButton btn = crearBoton("Inscripciones");
+            panelMenu.add(btn);
+            btn.addActionListener(e -> mostrarPanel("inscripciones"));
+        }
+
+        // Configuracion BD — solo ADMIN
+        if (rol == RolUsuario.ADMIN) {
+            JButton btn = crearBoton("Configuracion BD");
+            panelMenu.add(btn);
+            btn.addActionListener(e -> {
+                FrmConfiguracionBD dlg = new FrmConfiguracionBD(this);
+                dlg.setVisible(true);
+            });
+        }
+    }
+
+    public Usuario getUsuarioActual() {
+        return usuarioActual;
+    }
+
+    public void recargarTodo() {
+        if (pnlUsuarios != null)      pnlUsuarios.recargar();
+        if (pnlPracticas != null)     pnlPracticas.recargar();
+        if (pnlInstituciones != null) pnlInstituciones.recargar();
+        if (pnlGrupos != null)        pnlGrupos.recargar();
+        if (pnlInscripciones != null) pnlInscripciones.recargar();
+    }
+
+    public PnlGrupos getPnlGrupos() {
+        return pnlGrupos;
+    }
+
+    public PnlInscripciones getPnlInscripciones() {
+        return pnlInscripciones;
     }
 
     private void mostrarPanel(String nombre) {
@@ -88,13 +153,11 @@ public class FrmPrincipal extends JFrame {
 
     private JButton crearBoton(String texto) {
         JButton btn = new JButton(texto);
-
         btn.setFocusPainted(false);
         btn.setFont(new Font("Segoe UI", Font.BOLD, 14));
         btn.setBackground(new Color(52, 152, 219));
         btn.setForeground(Color.WHITE);
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-
         return btn;
     }
 }

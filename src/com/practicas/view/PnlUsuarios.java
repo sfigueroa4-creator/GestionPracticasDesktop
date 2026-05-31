@@ -20,10 +20,17 @@ public class PnlUsuarios extends JPanel {
     private JTextField txtNombre;
     private JTextField txtApellido;
     private JTextField txtEmail;
+    private JComboBox<com.practicas.model.RolUsuario> cbRol;
 
     private AuthService authService;
+    private FrmPrincipal frmPrincipal;
 
     public PnlUsuarios() {
+        this(null);
+    }
+
+    public PnlUsuarios(FrmPrincipal frmPrincipal) {
+        this.frmPrincipal = frmPrincipal;
 
         setLayout(new BorderLayout());
 
@@ -48,12 +55,13 @@ public class PnlUsuarios extends JPanel {
         JPanel panelFormulario = new JPanel();
 
         panelFormulario.setLayout(
-            new GridLayout(4,2,5,5)
+            new GridLayout(5,2,5,5)
         );
 
         txtNombre = new JTextField();
         txtApellido = new JTextField();
         txtEmail = new JTextField();
+        cbRol = new JComboBox<>(com.practicas.model.RolUsuario.values());
 
         panelFormulario.add(new JLabel("Nombre"));
         panelFormulario.add(txtNombre);
@@ -63,6 +71,9 @@ public class PnlUsuarios extends JPanel {
 
         panelFormulario.add(new JLabel("Email"));
         panelFormulario.add(txtEmail);
+
+        panelFormulario.add(new JLabel("Rol"));
+        panelFormulario.add(cbRol);
 
         JButton btnGuardar = new JButton("Guardar");
 
@@ -85,6 +96,7 @@ modelo = new DefaultTableModel() {
         modelo.addColumn("Nombre");
         modelo.addColumn("Apellido");
         modelo.addColumn("Email");
+        modelo.addColumn("Rol");
 
         tabla = new JTable(modelo);
 
@@ -112,7 +124,9 @@ modelo = new DefaultTableModel() {
 
             usuario.setPasswordHash("123456");
 
-            usuario.setRol(RolUsuario.ESTUDIANTE);
+            usuario.setRol(
+                (com.practicas.model.RolUsuario) cbRol.getSelectedItem()
+            );
 
             usuario.setActivo(true);
 
@@ -121,11 +135,17 @@ modelo = new DefaultTableModel() {
 
             if (guardado) {
 
-                modelo.addRow(new Object[] {
-                    usuario.getNombre(),
-                    usuario.getApellido(),
-                    usuario.getEmail()
-                });
+                cargarUsuarios();
+
+                // Recargar comboboxes de otros paneles que usan usuarios
+                if (frmPrincipal != null) {
+                    if (frmPrincipal.getPnlGrupos() != null) {
+                        frmPrincipal.getPnlGrupos().recargar();
+                    }
+                    if (frmPrincipal.getPnlInscripciones() != null) {
+                        frmPrincipal.getPnlInscripciones().recargar();
+                    }
+                }
 
                 JOptionPane.showMessageDialog(
                     this,
@@ -151,6 +171,23 @@ modelo = new DefaultTableModel() {
         }
     }
 
+    public void recargar() {
+        try {
+            java.sql.Connection con =
+                com.practicas.util.DatabaseConnection.getConnection(
+                    "GestionP",
+                    "GestionP"
+                );
+            authService = new AuthService(con);
+            cargarUsuarios();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(
+                this,
+                "Error recargando usuarios: " + e.getMessage()
+            );
+        }
+    }
+
     private void cargarUsuarios() {
 
         try {
@@ -162,7 +199,8 @@ modelo = new DefaultTableModel() {
                 modelo.addRow(new Object[] {
                     u.getNombre(),
                     u.getApellido(),
-                    u.getEmail()
+                    u.getEmail(),
+                    u.getRol() != null ? u.getRol().name() : ""
                 });
             }
 
@@ -180,5 +218,6 @@ modelo = new DefaultTableModel() {
         txtNombre.setText("");
         txtApellido.setText("");
         txtEmail.setText("");
+        cbRol.setSelectedIndex(0);
     }
 }

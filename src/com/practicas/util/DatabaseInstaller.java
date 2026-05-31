@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.practicas.util;
 
 import java.sql.Connection;
@@ -17,7 +13,6 @@ public class DatabaseInstaller {
     }
 
     public void crearTablas() throws SQLException {
-
         Statement st = conn.createStatement();
 
         st.executeUpdate("""
@@ -31,10 +26,8 @@ public class DatabaseInstaller {
                 ACTIVO NUMBER(1) DEFAULT 1,
                 TELEFONO VARCHAR2(30),
                 FECHA_CREACION TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                CONSTRAINT PK_USUARIO
-                    PRIMARY KEY (ID_USUARIO),
-                CONSTRAINT UK_USUARIO_EMAIL
-                    UNIQUE (EMAIL)
+                CONSTRAINT PK_USUARIO PRIMARY KEY (ID_USUARIO),
+                CONSTRAINT UK_USUARIO_EMAIL UNIQUE (EMAIL)
             )
         """);
 
@@ -50,10 +43,8 @@ public class DatabaseInstaller {
                 EMAIL_CONTACTO VARCHAR2(150),
                 CONVENIO_ACTIVO NUMBER(1) DEFAULT 1,
                 FECHA_CONVENIO DATE,
-                CONSTRAINT PK_INSTITUCION
-                    PRIMARY KEY (ID_INSTITUCION),
-                CONSTRAINT UK_INSTITUCION_NIT
-                    UNIQUE (NIT)
+                CONSTRAINT PK_INSTITUCION PRIMARY KEY (ID_INSTITUCION),
+                CONSTRAINT UK_INSTITUCION_NIT UNIQUE (NIT)
             )
         """);
 
@@ -69,8 +60,7 @@ public class DatabaseInstaller {
                 ESTADO VARCHAR2(30),
                 TIPO_PRACTICA VARCHAR2(100),
                 FECHA_CREACION TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                CONSTRAINT PK_PRACTICA
-                    PRIMARY KEY (ID_PRACTICA)
+                CONSTRAINT PK_PRACTICA PRIMARY KEY (ID_PRACTICA)
             )
         """);
 
@@ -83,17 +73,10 @@ public class DatabaseInstaller {
                 ID_INSTITUCION NUMBER NOT NULL,
                 CUPO_MAXIMO NUMBER(5),
                 OBSERVACIONES VARCHAR2(500),
-                CONSTRAINT PK_GRUPO
-                    PRIMARY KEY (ID_GRUPO),
-                CONSTRAINT FK_GRUPO_PRACTICA
-                    FOREIGN KEY (ID_PRACTICA)
-                    REFERENCES PRACTICA(ID_PRACTICA),
-                CONSTRAINT FK_GRUPO_DOCENTE
-                    FOREIGN KEY (ID_DOCENTE)
-                    REFERENCES USUARIO(ID_USUARIO),
-                CONSTRAINT FK_GRUPO_INSTITUCION
-                    FOREIGN KEY (ID_INSTITUCION)
-                    REFERENCES INSTITUCION_RECEPTORA(ID_INSTITUCION)
+                CONSTRAINT PK_GRUPO PRIMARY KEY (ID_GRUPO),
+                CONSTRAINT FK_GRUPO_PRACTICA FOREIGN KEY (ID_PRACTICA) REFERENCES PRACTICA(ID_PRACTICA),
+                CONSTRAINT FK_GRUPO_DOCENTE FOREIGN KEY (ID_DOCENTE) REFERENCES USUARIO(ID_USUARIO),
+                CONSTRAINT FK_GRUPO_INSTITUCION FOREIGN KEY (ID_INSTITUCION) REFERENCES INSTITUCION_RECEPTORA(ID_INSTITUCION)
             )
         """);
 
@@ -106,75 +89,27 @@ public class DatabaseInstaller {
                 ESTADO VARCHAR2(30),
                 FECHA_INSCRIPCION TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 OBSERVACION_FINAL VARCHAR2(500),
-                CONSTRAINT PK_INSCRIPCION_GRUPO
-                    PRIMARY KEY (ID_INSCRIPCION),
-                CONSTRAINT FK_INSCRIPCION_ESTUDIANTE
-                    FOREIGN KEY (ID_ESTUDIANTE)
-                    REFERENCES USUARIO(ID_USUARIO),
-                CONSTRAINT FK_INSCRIPCION_GRUPO
-                    FOREIGN KEY (ID_GRUPO)
-                    REFERENCES GRUPO_PRACTICA(ID_GRUPO)
+                CONSTRAINT PK_INSCRIPCION_GRUPO PRIMARY KEY (ID_INSCRIPCION),
+                CONSTRAINT FK_INSCRIPCION_ESTUDIANTE FOREIGN KEY (ID_ESTUDIANTE) REFERENCES USUARIO(ID_USUARIO),
+                CONSTRAINT FK_INSCRIPCION_GRUPO FOREIGN KEY (ID_GRUPO) REFERENCES GRUPO_PRACTICA(ID_GRUPO)
             )
         """);
 
         st.executeUpdate("""
-            INSERT INTO USUARIO
-            (
-                NOMBRE,
-                APELLIDO,
-                EMAIL,
-                PASSWORD_HASH,
-                ROL,
-                ACTIVO
-            )
-            VALUES
-            (
-                'Administrador',
-                'Sistema',
-                'admin',
-                'admin',
-                'ADMIN',
-                1
-            )
+            INSERT INTO USUARIO (NOMBRE, APELLIDO, EMAIL, PASSWORD_HASH, ROL, ACTIVO)
+            VALUES ('GestionP', 'Admin', 'GestionP', 'GestionP', 'ADMIN', 1)
         """);
 
         st.close();
     }
 
     public void borrarTablas() throws SQLException {
-
         Statement st = conn.createStatement();
-
-        try {
-            st.executeUpdate(
-                "DROP TABLE INSCRIPCION_GRUPO CASCADE CONSTRAINTS"
-            );
-        } catch (Exception e) {}
-
-        try {
-            st.executeUpdate(
-                "DROP TABLE GRUPO_PRACTICA CASCADE CONSTRAINTS"
-            );
-        } catch (Exception e) {}
-
-        try {
-            st.executeUpdate(
-                "DROP TABLE PRACTICA CASCADE CONSTRAINTS"
-            );
-        } catch (Exception e) {}
-
-        try {
-            st.executeUpdate(
-                "DROP TABLE INSTITUCION_RECEPTORA CASCADE CONSTRAINTS"
-            );
-        } catch (Exception e) {}
-
-        try {
-            st.executeUpdate(
-                "DROP TABLE USUARIO CASCADE CONSTRAINTS"
-            );
-        } catch (Exception e) {}
-
+        try { st.executeUpdate("DROP TABLE INSCRIPCION_GRUPO CASCADE CONSTRAINTS"); } catch (Exception e) {}
+        try { st.executeUpdate("DROP TABLE GRUPO_PRACTICA CASCADE CONSTRAINTS"); } catch (Exception e) {}
+        try { st.executeUpdate("DROP TABLE PRACTICA CASCADE CONSTRAINTS"); } catch (Exception e) {}
+        try { st.executeUpdate("DROP TABLE INSTITUCION_RECEPTORA CASCADE CONSTRAINTS"); } catch (Exception e) {}
+        try { st.executeUpdate("DROP TABLE USUARIO CASCADE CONSTRAINTS"); } catch (Exception e) {}
         st.close();
     }
 }
