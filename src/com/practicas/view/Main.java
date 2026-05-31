@@ -4,15 +4,21 @@
  * and open the template in the editor.
  */
 package com.practicas.view;
-
+import javax.swing.UIManager;
 
 public class Main {
 
-public static void main(String[] args) {
+    public static void main(String[] args) {
 
-    javax.swing.SwingUtilities.invokeLater(() -> {
+        try {
+            UIManager.setLookAndFeel(
+                "javax.swing.plaf.nimbus.NimbusLookAndFeel"
+            );
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         new FrmLogin().setVisible(true);
-    });
-
-}
+        
+    }
 }
