@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.practicas.view;
 
 import com.practicas.model.RolUsuario;
@@ -23,55 +19,75 @@ public class FrmConfiguracionBD extends JDialog {
     private FrmPrincipal frmPrincipal;
     private Usuario usuarioActual;
 
+    /** Abre el dialogo completo (conexion + tablas) desde FrmPrincipal. */
     public FrmConfiguracionBD(FrmPrincipal parent) {
         super(parent, true);
         this.frmPrincipal = parent;
         this.usuarioActual = parent.getUsuarioActual();
-        construirUI(parent);
+        construirUI(parent, false);
     }
 
-    private void construirUI(Frame parent) {
 
-        setTitle("Configuracion BD");
-        setSize(400, 300);
-        setLocationRelativeTo(parent);
-        setLayout(new GridLayout(5, 2, 5, 5));
+    public FrmConfiguracionBD(Window parent) {
+        super(parent, ModalityType.APPLICATION_MODAL);
+        construirUI(null, true);
+    }
 
-        txtHost    = new JTextField(DatabaseConfig.getHost());
-        txtPuerto  = new JTextField(DatabaseConfig.getPuerto());
+    private void construirUI(Frame frameParent, boolean soloConexion) {
+        setTitle(soloConexion ? "Configuración de conexión" : "Configuración BD");
+        setLocationRelativeTo(frameParent);
+        setResizable(false);
+
+        txtHost     = new JTextField(DatabaseConfig.getHost());
+        txtPuerto   = new JTextField(DatabaseConfig.getPuerto());
         txtServicio = new JTextField(DatabaseConfig.getServicio());
-
-        add(new JLabel("Host"));
-        add(txtHost);
-
-        add(new JLabel("Puerto"));
-        add(txtPuerto);
-
-        add(new JLabel("Servicio"));
-        add(txtServicio);
 
         JButton btnGuardar  = new JButton("Guardar");
         JButton btnCancelar = new JButton("Cancelar");
-        JButton btnCrear    = new JButton("Crear tablas");
-        JButton btnBorrar   = new JButton("Borrar tablas");
 
-        // Las operaciones destructivas se muestran en rojo para dejar claro su impacto
-        btnBorrar.setBackground(new Color(192, 57, 43));
-        btnBorrar.setForeground(Color.WHITE);
-        btnBorrar.setOpaque(true);
-
-        add(btnGuardar);
-        add(btnCancelar);
-        add(btnCrear);
-        add(btnBorrar);
-
-        btnGuardar.addActionListener(e -> guardar());
+        btnGuardar.addActionListener(e -> guardar(soloConexion));
         btnCancelar.addActionListener(e -> dispose());
-        btnCrear.addActionListener(e -> crearTablas());
-        btnBorrar.addActionListener(e -> borrarTablas());
+
+        if (soloConexion) {
+            setLayout(new GridLayout(4, 2, 8, 8));
+            setSize(400, 200);
+            getRootPane().setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+            add(new JLabel("Host"));
+            add(txtHost);
+            add(new JLabel("Puerto"));
+            add(txtPuerto);
+            add(new JLabel("Servicio"));
+            add(txtServicio);
+            add(btnGuardar);
+            add(btnCancelar);
+        } else {
+            setLayout(new GridLayout(5, 2, 8, 8));
+            setSize(400, 280);
+
+            JButton btnCrear  = new JButton("Crear tablas");
+            JButton btnBorrar = new JButton("Borrar tablas");
+
+            btnBorrar.setBackground(new Color(192, 57, 43));
+            btnBorrar.setForeground(Color.WHITE);
+            btnBorrar.setOpaque(true);
+
+            btnCrear.addActionListener(e -> crearTablas());
+            btnBorrar.addActionListener(e -> borrarTablas());
+
+            add(new JLabel("Host"));
+            add(txtHost);
+            add(new JLabel("Puerto"));
+            add(txtPuerto);
+            add(new JLabel("Servicio"));
+            add(txtServicio);
+            add(btnGuardar);
+            add(btnCancelar);
+            add(btnCrear);
+            add(btnBorrar);
+        }
     }
 
-    /** Verifica que el usuario actual sea ADMIN. Muestra error y retorna false si no lo es. */
     private boolean verificarAdmin() {
         if (usuarioActual == null || usuarioActual.getRol() != RolUsuario.ADMIN) {
             JOptionPane.showMessageDialog(
@@ -85,16 +101,17 @@ public class FrmConfiguracionBD extends JDialog {
         return true;
     }
 
-    private void guardar() {
-        if (!verificarAdmin()) return;
+    private void guardar(boolean soloConexion) {
+        if (!soloConexion && !verificarAdmin()) return;
 
         DatabaseConfig.guardar(
-            txtHost.getText(),
-            txtPuerto.getText(),
-            txtServicio.getText()
+            txtHost.getText().trim(),
+            txtPuerto.getText().trim(),
+            txtServicio.getText().trim()
         );
 
-        JOptionPane.showMessageDialog(this, "Configuracion guardada");
+        JOptionPane.showMessageDialog(this, "Configuración guardada");
+        dispose();
     }
 
     private void crearTablas() {
@@ -103,21 +120,11 @@ public class FrmConfiguracionBD extends JDialog {
         try {
             Connection con = DatabaseConnection.getConnection("GestionP", "GestionP");
             new DatabaseInstaller(con).crearTablas();
-
             JOptionPane.showMessageDialog(this, "Tablas creadas correctamente");
             con.close();
-
-            if (frmPrincipal != null) {
-                frmPrincipal.recargarTodo();
-            }
-
+            if (frmPrincipal != null) frmPrincipal.recargarTodo();
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(
-                this,
-                "Error: " + e.getMessage(),
-                "Error",
-                JOptionPane.ERROR_MESSAGE
-            );
+            JOptionPane.showMessageDialog(this, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -127,35 +134,24 @@ public class FrmConfiguracionBD extends JDialog {
         int r1 = JOptionPane.showConfirmDialog(
             this,
             "Te recomendamos hacer una copia de seguridad antes de continuar.\n¿Desea continuar?",
-            "Advertencia",
-            JOptionPane.YES_NO_OPTION,
-            JOptionPane.WARNING_MESSAGE
+            "Advertencia", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE
         );
         if (r1 != JOptionPane.YES_OPTION) return;
 
         int r2 = JOptionPane.showConfirmDialog(
             this,
             "Esta accion eliminara TODA la informacion.\n¿Esta completamente seguro?",
-            "Confirmacion final",
-            JOptionPane.YES_NO_OPTION,
-            JOptionPane.WARNING_MESSAGE
+            "Confirmacion final", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE
         );
         if (r2 != JOptionPane.YES_OPTION) return;
 
         try {
             Connection con = DatabaseConnection.getConnection("GestionP", "GestionP");
             new DatabaseInstaller(con).borrarTablas();
-
             JOptionPane.showMessageDialog(this, "Tablas eliminadas correctamente");
             con.close();
-
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(
-                this,
-                "Error: " + e.getMessage(),
-                "Error",
-                JOptionPane.ERROR_MESSAGE
-            );
+            JOptionPane.showMessageDialog(this, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 }

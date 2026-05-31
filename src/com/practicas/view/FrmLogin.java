@@ -36,25 +36,23 @@ public class FrmLogin extends JFrame {
         setLayout(new BorderLayout());
 
         try {
-
             Connection con =
                 com.practicas.util.DatabaseConnection
-                    .getConnection(
-                        "GestionP",
-                        "GestionP"
-                    );
-
-            authService =
-                new AuthService(con);
-
+                    .getConnection("GestionP", "GestionP");
+            authService = new AuthService(con);
         } catch (Exception e) {
-
-            JOptionPane.showMessageDialog(
-                this,
-                "Error conexión: "
-                + e.getMessage()
-            );
+            JOptionPane.showMessageDialog(this, "Error conexion: " + e.getMessage());
         }
+
+        JButton btnConfig = new JButton("⚙");
+        btnConfig.setToolTipText("Configurar conexion a base de datos");
+        btnConfig.setFocusPainted(false);
+
+        JPanel panelSuperior = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        panelSuperior.add(btnConfig);
+        add(panelSuperior, BorderLayout.NORTH);
+
+        btnConfig.addActionListener(e -> new FrmConfiguracionBD(this).setVisible(true));
 
         JPanel panel =
             new JPanel(
@@ -110,16 +108,14 @@ public class FrmLogin extends JFrame {
     }
 
     private void login() {
-
         try {
+            // Reconectar con la configuracion actual por si cambio antes del login
+            Connection con =
+                com.practicas.util.DatabaseConnection.getConnection("GestionP", "GestionP");
+            authService = new AuthService(con);
 
-            String email =
-                txtEmail.getText();
-
-            String password =
-                String.valueOf(
-                    txtPassword.getPassword()
-                );
+            String email    = txtEmail.getText();
+            String password = String.valueOf(txtPassword.getPassword());
 
             Usuario usuario =
                 authService.login(
