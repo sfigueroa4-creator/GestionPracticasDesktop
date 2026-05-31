@@ -18,9 +18,6 @@ public class GrupoPracticaDAO {
         this.conn = conn;
     }
 
-    // =========================
-    // INSERTAR
-    // =========================
 public void insertar(GrupoPractica g) throws SQLException {
 
     String sql = """
@@ -30,7 +27,13 @@ public void insertar(GrupoPractica g) throws SQLException {
          CUPO_MAXIMO, OBSERVACIONES)
         VALUES (?, ?, ?, ?, ?, ?)
     """;
+    if (g == null ||
+    g.getPractica() == null ||
+    g.getDocenteAsesor() == null ||
+    g.getInstitucion() == null) {
 
+    throw new SQLException("Datos incompletos");
+}
     PreparedStatement ps = conn.prepareStatement(sql);
 
     ps.setString(1, g.getNombre());
@@ -59,9 +62,6 @@ public void insertar(GrupoPractica g) throws SQLException {
     ps.close();
 }
 
-    // =========================
-    // LISTAR
-    // =========================
     public List<GrupoPractica> listar()
             throws SQLException {
 
@@ -111,9 +111,6 @@ public void insertar(GrupoPractica g) throws SQLException {
         return lista;
     }
 
-    // =========================
-    // ACTUALIZAR
-    // =========================
     public void actualizar(GrupoPractica g)
             throws SQLException {
 
@@ -143,9 +140,6 @@ public void insertar(GrupoPractica g) throws SQLException {
         }
     }
 
-    // =========================
-    // ELIMINAR
-    // =========================
     public void eliminar(int idGrupo)
             throws SQLException {
 

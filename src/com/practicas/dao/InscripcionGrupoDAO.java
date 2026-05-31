@@ -18,9 +18,6 @@ public class InscripcionGrupoDAO {
         this.conn = conn;
     }
 
-    // =========================
-    // CREATE (INSERT)
-    // =========================
 public void insertar(InscripcionGrupo i) throws SQLException {
 
     String sql = """
@@ -33,7 +30,14 @@ public void insertar(InscripcionGrupo i) throws SQLException {
     """;
 
     PreparedStatement ps = conn.prepareStatement(sql);
+    
+    if (i == null ||
+    i.getEstudiante() == null ||
+    i.getGrupo() == null ||
+    i.getEstado() == null) {
 
+    throw new SQLException("Datos incompletos");
+}
     ps.setInt(1,
         i.getEstudiante().getIdUsuario()
     );
@@ -66,9 +70,6 @@ public void insertar(InscripcionGrupo i) throws SQLException {
     ps.close();
 }
 
-    // =========================
-    // READ (LISTAR TODO)
-    // =========================
     public List<InscripcionGrupo> listar() throws SQLException {
 
         List<InscripcionGrupo> lista = new ArrayList<>();
@@ -84,10 +85,11 @@ public void insertar(InscripcionGrupo i) throws SQLException {
             i.setIdInscripcion(rs.getInt("ID_INSCRIPCION"));
             i.setHorasCumplidas(rs.getDouble("HORAS_CUMPLIDAS"));
             i.setEstado(InscripcionGrupo.EstadoInscripcion.valueOf(rs.getString("ESTADO")));
-            i.setFechaInscripcion(rs.getTimestamp("FECHA_INSCRIPCION").toLocalDateTime());
+            Timestamp ts =  rs.getTimestamp("FECHA_INSCRIPCION");
+            if (ts != null) {
+            i.setFechaInscripcion(ts.toLocalDateTime());
+            }
             i.setObservacionFinal(rs.getString("OBSERVACION_FINAL"));
-
-            // OJO: aquí solo estás trayendo IDs, no objetos completos
             lista.add(i);
         }
 
@@ -97,9 +99,6 @@ public void insertar(InscripcionGrupo i) throws SQLException {
         return lista;
     }
 
-    // =========================
-    // UPDATE
-    // =========================
     public void actualizar(InscripcionGrupo i) throws SQLException {
 
         String sql = """
@@ -121,9 +120,6 @@ public void insertar(InscripcionGrupo i) throws SQLException {
         ps.close();
     }
 
-    // =========================
-    // DELETE
-    // =========================
     public void eliminar(int idInscripcion) throws SQLException {
 
         String sql = "DELETE FROM INSCRIPCION_GRUPO WHERE ID_INSCRIPCION = ?";
