@@ -99,7 +99,7 @@ if (Test-Path "$base\MANUAL_USUARIO.md") {
 }
 
 # --- Lanzador Windows ---
-Set-Content -Path "$release\iniciar.bat" -Encoding ASCII -Value "@echo off`r`njava -jar GestionPracticasDesktop.jar`r`nif %ERRORLEVEL% NEQ 0 (`r`n    echo.`r`n    echo Error al iniciar. Verifique que Java 17 o superior este instalado.`r`n    pause`r`n)"
+Set-Content -Path "$release\iniciar.bat" -Encoding ASCII -Value "@echo off`r`nstart `"`" javaw -jar GestionPracticasDesktop.jar`r`nif %ERRORLEVEL% NEQ 0 (`r`n    echo.`r`n    echo Error al iniciar. Verifique que Java 17 o superior este instalado.`r`n    pause`r`n)"
 
 # --- Lanzador Linux/macOS ---
 Set-Content -Path "$release\iniciar.sh" -Encoding UTF8 -Value "#!/bin/bash`njava -jar GestionPracticasDesktop.jar`n"

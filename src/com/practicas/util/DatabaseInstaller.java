@@ -180,10 +180,7 @@ public class DatabaseInstaller {
 
     private void crearProcedimientos(Statement st) throws SQLException {
 
-        // Procedimiento 1: Inscribir estudiante validando cupo disponible
-        // Requisito: al inscribir un estudiante, verificar que el grupo no haya
-        // superado su cupo maximo antes de insertar.
-        st.executeUpdate("""
+        st.execute("""
             CREATE OR REPLACE PROCEDURE SP_INSCRIBIR_ESTUDIANTE(
                 p_id_estudiante IN NUMBER,
                 p_id_grupo      IN NUMBER,
@@ -220,9 +217,7 @@ public class DatabaseInstaller {
             END SP_INSCRIBIR_ESTUDIANTE;
         """);
 
-        // Procedimiento 2: Actualizar horas cumplidas de una inscripcion
-        // Requisito: permitir al docente registrar el avance de horas de un estudiante.
-        st.executeUpdate("""
+        st.execute("""
             CREATE OR REPLACE PROCEDURE SP_ACTUALIZAR_HORAS(
                 p_id_inscripcion IN NUMBER,
                 p_horas          IN NUMBER,
@@ -231,8 +226,8 @@ public class DatabaseInstaller {
             ) AS
             BEGIN
                 UPDATE INSCRIPCION_GRUPO
-                SET HORAS_CUMPLIDAS  = p_horas,
-                    ESTADO           = p_estado,
+                SET HORAS_CUMPLIDAS   = p_horas,
+                    ESTADO            = p_estado,
                     OBSERVACION_FINAL = p_observacion
                 WHERE ID_INSCRIPCION = p_id_inscripcion;
 
@@ -247,15 +242,13 @@ public class DatabaseInstaller {
 
     private void crearFunciones(Statement st) throws SQLException {
 
-        // Funcion 1: Calcular porcentaje de horas cumplidas de un estudiante en un grupo
-        // Requisito: mostrar el avance del estudiante respecto a las horas reglamentarias.
-        st.executeUpdate("""
+        st.execute("""
             CREATE OR REPLACE FUNCTION FN_PORCENTAJE_HORAS(
                 p_id_inscripcion IN NUMBER
             ) RETURN NUMBER AS
-                v_horas_cumplidas    NUMBER;
+                v_horas_cumplidas      NUMBER;
                 v_horas_reglamentarias NUMBER;
-                v_porcentaje         NUMBER;
+                v_porcentaje           NUMBER;
             BEGIN
                 SELECT ig.HORAS_CUMPLIDAS, p.HORAS_REGLAMENTARIAS
                 INTO v_horas_cumplidas, v_horas_reglamentarias
@@ -276,9 +269,7 @@ public class DatabaseInstaller {
             END FN_PORCENTAJE_HORAS;
         """);
 
-        // Funcion 2: Contar inscripciones activas de un grupo
-        // Requisito: consultar cuantos estudiantes activos tiene un grupo en un momento dado.
-        st.executeUpdate("""
+        st.execute("""
             CREATE OR REPLACE FUNCTION FN_INSCRITOS_ACTIVOS(
                 p_id_grupo IN NUMBER
             ) RETURN NUMBER AS
@@ -295,9 +286,7 @@ public class DatabaseInstaller {
 
     private void crearDisparadores(Statement st) throws SQLException {
 
-        // Disparador 1: Registrar auditoria cada vez que se cambia la contrasena
-        // Requisito: trazabilidad de cambios de contrasena por seguridad.
-        st.executeUpdate("""
+        st.execute("""
             CREATE OR REPLACE TRIGGER TRG_AUDITORIA_PASSWORD
             AFTER UPDATE OF PASSWORD_HASH ON USUARIO
             FOR EACH ROW
@@ -309,10 +298,7 @@ public class DatabaseInstaller {
             END TRG_AUDITORIA_PASSWORD;
         """);
 
-        // Disparador 2: Impedir inscripcion si el grupo ya alcanzo su cupo maximo
-        // Requisito: garantizar integridad del cupo a nivel de base de datos,
-        // como segunda capa de validacion ademas del procedimiento SP_INSCRIBIR_ESTUDIANTE.
-        st.executeUpdate("""
+        st.execute("""
             CREATE OR REPLACE TRIGGER TRG_VALIDAR_CUPO
             BEFORE INSERT ON INSCRIPCION_GRUPO
             FOR EACH ROW
@@ -336,10 +322,7 @@ public class DatabaseInstaller {
             END TRG_VALIDAR_CUPO;
         """);
 
-        // Disparador 3: Marcar inscripcion como COMPLETADO cuando horas cumplidas
-        // alcanzan o superan las horas reglamentarias de la practica.
-        // Requisito: automatizar el cambio de estado al completar las horas.
-        st.executeUpdate("""
+        st.execute("""
             CREATE OR REPLACE TRIGGER TRG_COMPLETAR_INSCRIPCION
             BEFORE UPDATE OF HORAS_CUMPLIDAS ON INSCRIPCION_GRUPO
             FOR EACH ROW
