@@ -78,6 +78,25 @@ public class UsuarioDAO {
         ps.close();
     }
 
+    public List<Usuario> listarPorRol(String rol) throws SQLException {
+        List<Usuario> lista = new ArrayList<>();
+        PreparedStatement ps = conn.prepareStatement(
+            "SELECT ID_USUARIO, NOMBRE, APELLIDO FROM USUARIO WHERE ROL = ? AND ACTIVO = 1"
+        );
+        ps.setString(1, rol);
+        ResultSet rs = ps.executeQuery();
+        while (rs.next()) {
+            Usuario u = new Usuario();
+            u.setIdUsuario(rs.getInt("ID_USUARIO"));
+            u.setNombre(rs.getString("NOMBRE"));
+            u.setApellido(rs.getString("APELLIDO"));
+            lista.add(u);
+        }
+        rs.close();
+        ps.close();
+        return lista;
+    }
+
     public void cambiarPassword(int idUsuario, String nuevaPassword) throws SQLException {
         PreparedStatement ps = conn.prepareStatement(
             "UPDATE USUARIO SET PASSWORD_HASH = ? WHERE ID_USUARIO = ?"

@@ -53,7 +53,14 @@ public class GrupoPracticaService {
     }
 
     public List<Usuario> obtenerDocentes() {
-        try { return usuarioDAO.listar(); } catch (SQLException e) { e.printStackTrace(); }
+        try {
+            List<Usuario> docentes = new ArrayList<>();
+            docentes.addAll(usuarioDAO.listarPorRol("DOCENTE"));
+            docentes.addAll(usuarioDAO.listarPorRol("COORDINADOR"));
+            docentes.addAll(usuarioDAO.listarPorRol("DIRECTOR"));
+            docentes.addAll(usuarioDAO.listarPorRol("ADMIN"));
+            return docentes;
+        } catch (SQLException e) { e.printStackTrace(); }
         return new ArrayList<>();
     }
 

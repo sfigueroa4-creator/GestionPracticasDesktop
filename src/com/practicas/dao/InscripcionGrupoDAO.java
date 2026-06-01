@@ -82,12 +82,15 @@ public class InscripcionGrupoDAO {
 
     public List<Usuario> obtenerEstudiantes() throws SQLException {
         List<Usuario> lista = new ArrayList<>();
-        PreparedStatement ps = conn.prepareStatement("SELECT * FROM USUARIO WHERE ROL = 'ESTUDIANTE'");
+        PreparedStatement ps = conn.prepareStatement(
+            "SELECT ID_USUARIO, NOMBRE, APELLIDO FROM USUARIO WHERE ROL = 'ESTUDIANTE' AND ACTIVO = 1"
+        );
         ResultSet rs = ps.executeQuery();
         while (rs.next()) {
             Usuario u = new Usuario();
             u.setIdUsuario(rs.getInt("ID_USUARIO"));
             u.setNombre(rs.getString("NOMBRE"));
+            u.setApellido(rs.getString("APELLIDO"));
             lista.add(u);
         }
         rs.close();
