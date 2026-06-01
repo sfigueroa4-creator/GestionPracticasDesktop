@@ -1,0 +1,245 @@
+@startuml Diagrama_Clases
+
+skinparam classAttributeIconSize 0
+skinparam class {
+    BackgroundColor #FEFECE
+    BorderColor #A80036
+    ArrowColor #A80036
+    HeaderBackgroundColor #FFAAAA
+}
+skinparam stereotypeCBackgroundColor #ADD8E6
+
+title Sistema de Gestion de Practicas - Diagrama de Clases
+
+' ═══════════════════════════════════════════════════════════
+' CAPA MODEL
+' ═══════════════════════════════════════════════════════════
+
+enum RolUsuario <<enumeration>> {
+    ADMIN
+    DIRECTOR
+    COORDINADOR
+    DOCENTE
+    ESTUDIANTE
+    INSTITUCION
+}
+
+class Usuario {
+    - idUsuario : int
+    - nombre : String
+    - apellido : String
+    - email : String
+    - passwordHash : String
+    - rol : RolUsuario
+    - activo : boolean
+    - telefono : String
+    - fechaCreacion : LocalDateTime
+    + getNombreCompleto() : String
+    + toString() : String
+}
+
+class Practica {
+    - idPractica : int
+    - nombre : String
+    - descripcion : String
+    - numeroPractica : int
+    - horasReglamentarias : int
+    - fechaInicio : LocalDate
+    - fechaFin : LocalDate
+    - estado : EstadoPractica
+    - tipoPractica : String
+    - fechaCreacion : LocalDateTime
+    + estaActiva() : boolean
+    + toString() : String
+}
+
+enum EstadoPractica <<enumeration>> {
+    PROGRAMADA
+    ACTIVA
+    FINALIZADA
+}
+
+class GrupoPractica {
+    - idGrupo : int
+    - nombre : String
+    - cupoMaximo : int
+    - observaciones : String
+    + toString() : String
+}
+
+class InstitucionReceptora {
+    - idInstitucion : int
+    - nombre : String
+    - nit : String
+    - direccion : String
+    - municipio : String
+    - departamento : String
+    - telefono : String
+    - emailContacto : String
+    - convenioActivo : boolean
+    - fechaConvenio : LocalDate
+    + toString() : String
+}
+
+class InscripcionGrupo {
+    - idInscripcion : int
+    - horasCumplidas : double
+    - estado : EstadoInscripcion
+    - fechaInscripcion : LocalDateTime
+    - observacionFinal : String
+    + getPorcentajeCumplimiento() : double
+}
+
+enum EstadoInscripcion <<enumeration>> {
+    ACTIVO
+    COMPLETADO
+    RETIRADO
+    REPROBADO
+}
+
+' ═══════════════════════════════════════════════════════════
+' CAPA DAO
+' ═══════════════════════════════════════════════════════════
+
+class UsuarioDAO {
+    - conn : Connection
+    + insertar(u : Usuario) : void
+    + listar() : List<Usuario>
+    + actualizar(u : Usuario) : void
+    + eliminar(id : int) : void
+    + cambiarPassword(id : int, pass : String) : void
+    + login(email : String, pass : String) : Usuario
+}
+
+class PracticaDAO {
+    - conn : Connection
+    + insertar(p : Practica) : void
+    + listar() : List<Practica>
+    + actualizar(p : Practica) : void
+    + eliminar(id : int) : void
+}
+
+class GrupoPracticaDAO {
+    - conn : Connection
+    + insertar(g : GrupoPractica) : void
+    + listar() : List<GrupoPractica>
+    + actualizar(g : GrupoPractica) : void
+    + eliminar(id : int) : void
+}
+
+class InstitucionReceptoraDAO {
+    - conn : Connection
+    + insertar(i : InstitucionReceptora) : void
+    + listar() : List<InstitucionReceptora>
+    + actualizar(i : InstitucionReceptora) : void
+    + eliminar(id : int) : void
+}
+
+class InscripcionGrupoDAO {
+    - conn : Connection
+    + insertar(i : InscripcionGrupo) : void
+    + listar() : List<InscripcionGrupo>
+    + actualizar(i : InscripcionGrupo) : void
+    + eliminar(id : int) : void
+    + obtenerEstudiantes() : List<Usuario>
+    + obtenerGrupos() : List<GrupoPractica>
+}
+
+' ═══════════════════════════════════════════════════════════
+' CAPA SERVICE
+' ═══════════════════════════════════════════════════════════
+
+class AuthService {
+    - usuarioDAO : UsuarioDAO
+    + registrarUsuario(u : Usuario) : boolean
+    + login(email : String, pass : String) : Usuario
+    + obtenerUsuarios() : List<Usuario>
+    + cambiarPassword(id : int, pass : String) : boolean
+}
+
+class PracticaService {
+    - practicaDAO : PracticaDAO
+    + crearPractica(p : Practica) : void
+    + obtenerPracticas() : List<Practica>
+    + actualizarPractica(p : Practica) : void
+    + eliminarPractica(id : int) : void
+}
+
+class GrupoPracticaService {
+    - grupoDAO : GrupoPracticaDAO
+    - practicaDAO : PracticaDAO
+    - usuarioDAO : UsuarioDAO
+    - institucionDAO : InstitucionReceptoraDAO
+    + crearGrupo(g : GrupoPractica) : void
+    + obtenerGrupos() : List<GrupoPractica>
+    + obtenerPracticas() : List<Practica>
+    + obtenerDocentes() : List<Usuario>
+    + obtenerInstituciones() : List<InstitucionReceptora>
+}
+
+' ═══════════════════════════════════════════════════════════
+' CAPA UTIL
+' ═══════════════════════════════════════════════════════════
+
+class DatabaseConnection {
+    + {static} getConnection(user : String, pass : String) : Connection
+}
+
+class DatabaseConfig {
+    - {static} FILE : String
+    + {static} getHost() : String
+    + {static} getPuerto() : String
+    + {static} getServicio() : String
+    + {static} guardar(host, puerto, servicio : String) : void
+}
+
+class DatabaseInstaller {
+    - conn : Connection
+    + crearTablas() : void
+    + borrarTablas() : void
+}
+
+' ═══════════════════════════════════════════════════════════
+' RELACIONES - MODEL
+' ═══════════════════════════════════════════════════════════
+
+Usuario       "1" -- "1"   RolUsuario         : tiene >
+Practica      "1" -- "1"   EstadoPractica     : tiene >
+InscripcionGrupo "1" -- "1" EstadoInscripcion : tiene >
+
+GrupoPractica "many" --> "1" Practica          : pertenece a >
+GrupoPractica "many" --> "1" Usuario           : asesorado por >
+GrupoPractica "many" --> "1" InstitucionReceptora : realizado en >
+InscripcionGrupo "many" --> "1" Usuario        : inscribe a >
+InscripcionGrupo "many" --> "1" GrupoPractica  : pertenece a >
+
+' ═══════════════════════════════════════════════════════════
+' RELACIONES - DAO → MODEL
+' ═══════════════════════════════════════════════════════════
+
+UsuarioDAO          ..> Usuario             : <<usa>>
+PracticaDAO         ..> Practica            : <<usa>>
+GrupoPracticaDAO    ..> GrupoPractica       : <<usa>>
+InstitucionReceptoraDAO ..> InstitucionReceptora : <<usa>>
+InscripcionGrupoDAO ..> InscripcionGrupo    : <<usa>>
+
+' ═══════════════════════════════════════════════════════════
+' RELACIONES - SERVICE → DAO
+' ═══════════════════════════════════════════════════════════
+
+AuthService          --> UsuarioDAO
+PracticaService      --> PracticaDAO
+GrupoPracticaService --> GrupoPracticaDAO
+GrupoPracticaService --> PracticaDAO
+GrupoPracticaService --> UsuarioDAO
+GrupoPracticaService --> InstitucionReceptoraDAO
+
+' ═══════════════════════════════════════════════════════════
+' RELACIONES - UTIL
+' ═══════════════════════════════════════════════════════════
+
+DatabaseConnection ..> DatabaseConfig    : <<usa>>
+DatabaseInstaller  ..> DatabaseConnection : <<usa>>
+UsuarioDAO         ..> DatabaseConnection : <<usa>>
+
+@enduml

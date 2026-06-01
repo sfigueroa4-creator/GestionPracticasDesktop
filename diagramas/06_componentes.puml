@@ -1,0 +1,107 @@
+@startuml Componentes
+
+skinparam componentStyle rectangle
+skinparam component {
+    BackgroundColor #FEFECE
+    BorderColor #A80036
+    ArrowColor #A80036
+}
+skinparam package {
+    BackgroundColor #EEF0FF
+    BorderColor #5555AA
+}
+skinparam database {
+    BackgroundColor #FFFACD
+    BorderColor #A80036
+}
+skinparam node {
+    BackgroundColor #E8FFE8
+    BorderColor #007700
+}
+
+title Sistema de Gestion de Practicas - Diagrama de Componentes
+
+package "GestionPracticasDesktop.jar" {
+
+    package "Vista (com.practicas.view)" {
+        [FrmLogin]
+        [FrmPrincipal]
+        [FrmConfiguracionBD]
+        [PnlUsuarios]
+        [PnlPracticas]
+        [PnlInstituciones]
+        [PnlGrupos]
+        [PnlInscripciones]
+    }
+
+    package "Servicio (com.practicas.service)" {
+        [AuthService]
+        [PracticaService]
+        [GrupoPracticaService]
+    }
+
+    package "Acceso a Datos (com.practicas.dao)" {
+        [UsuarioDAO]
+        [PracticaDAO]
+        [GrupoPracticaDAO]
+        [InstitucionReceptoraDAO]
+        [InscripcionGrupoDAO]
+    }
+
+    package "Modelo (com.practicas.model)" {
+        [Usuario]
+        [Practica]
+        [GrupoPractica]
+        [InstitucionReceptora]
+        [InscripcionGrupo]
+        [RolUsuario]
+    }
+
+    package "Utilidades (com.practicas.util)" {
+        [DatabaseConnection]
+        [DatabaseConfig]
+        [DatabaseInstaller]
+    }
+}
+
+file "config.properties" as CONFIG
+
+database "Oracle Database" as ORACLE {
+    [USUARIO]
+    [PRACTICA]
+    [GRUPO_PRACTICA]
+    [INSTITUCION_RECEPTORA]
+    [INSCRIPCION_GRUPO]
+}
+
+' ─── Dependencias Vista → Servicio ─────────────────────────
+[FrmLogin]          --> [AuthService]
+[PnlUsuarios]       --> [AuthService]
+[PnlPracticas]      --> [PracticaService]
+[PnlGrupos]         --> [GrupoPracticaService]
+[PnlInstituciones]  --> [InstitucionReceptoraDAO]
+[PnlInscripciones]  --> [InscripcionGrupoDAO]
+[FrmConfiguracionBD] --> [DatabaseInstaller]
+
+' ─── Dependencias Servicio → DAO ───────────────────────────
+[AuthService]          --> [UsuarioDAO]
+[PracticaService]      --> [PracticaDAO]
+[GrupoPracticaService] --> [GrupoPracticaDAO]
+[GrupoPracticaService] --> [PracticaDAO]
+[GrupoPracticaService] --> [UsuarioDAO]
+[GrupoPracticaService] --> [InstitucionReceptoraDAO]
+
+' ─── Dependencias DAO → Util ───────────────────────────────
+[UsuarioDAO]            --> [DatabaseConnection]
+[PracticaDAO]           --> [DatabaseConnection]
+[GrupoPracticaDAO]      --> [DatabaseConnection]
+[InstitucionReceptoraDAO] --> [DatabaseConnection]
+[InscripcionGrupoDAO]   --> [DatabaseConnection]
+[DatabaseInstaller]     --> [DatabaseConnection]
+
+' ─── Util → Config y BD ────────────────────────────────────
+[DatabaseConnection] --> [DatabaseConfig]
+[DatabaseConfig]     --> CONFIG : lee/escribe
+[DatabaseConnection] --> ORACLE : JDBC (ojdbc17)
+
+@enduml

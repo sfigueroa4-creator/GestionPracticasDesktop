@@ -1,0 +1,130 @@
+@startuml Casos_de_Uso
+
+skinparam actorStyle awesome
+skinparam packageStyle rectangle
+skinparam usecase {
+    BackgroundColor #FEFECE
+    BorderColor #A80036
+    ArrowColor #A80036
+}
+skinparam actor {
+    BackgroundColor #FEFECE
+    BorderColor #A80036
+}
+
+title Sistema de Gestion de Practicas - Diagrama de Casos de Uso
+
+' ─── Actores ───────────────────────────────────────────────
+actor "Administrador"   as ADMIN
+actor "Director"        as DIRECTOR
+actor "Coordinador"     as COORD
+actor "Docente"         as DOCENTE
+actor "Estudiante"      as ESTUDIANTE
+actor "Institucion"     as INST
+
+' Herencia de actores
+ADMIN    -|> DIRECTOR
+DIRECTOR -|> COORD
+COORD    -|> DOCENTE
+
+' ─── Sistema ───────────────────────────────────────────────
+rectangle "Sistema de Gestion de Practicas" {
+
+    ' --- Autenticacion ---
+    package "Autenticacion" {
+        usecase "Iniciar sesion"            as UC_LOGIN
+        usecase "Configurar conexion BD"    as UC_CONF_CONN
+    }
+
+    ' --- Gestion de Usuarios ---
+    package "Gestion de Usuarios" {
+        usecase "Registrar usuario"         as UC_REG_USR
+        usecase "Cambiar contrasena"        as UC_PASS
+        usecase "Configurar BD\n(crear/borrar tablas)" as UC_CONF_BD
+    }
+
+    ' --- Gestion de Practicas ---
+    package "Gestion de Practicas" {
+        usecase "Crear practica"            as UC_CREAR_P
+        usecase "Actualizar practica"       as UC_ACT_P
+        usecase "Eliminar practica"         as UC_ELIM_P
+        usecase "Consultar practicas"       as UC_VER_P
+    }
+
+    ' --- Gestion de Instituciones ---
+    package "Gestion de Instituciones" {
+        usecase "Registrar institucion"     as UC_CREAR_I
+        usecase "Consultar instituciones"   as UC_VER_I
+    }
+
+    ' --- Gestion de Grupos ---
+    package "Gestion de Grupos" {
+        usecase "Crear grupo"               as UC_CREAR_G
+        usecase "Consultar grupos"          as UC_VER_G
+    }
+
+    ' --- Gestion de Inscripciones ---
+    package "Gestion de Inscripciones" {
+        usecase "Inscribir estudiante"      as UC_INSCR
+        usecase "Consultar inscripciones"   as UC_VER_INS
+    }
+}
+
+' ─── Relaciones Actor → Caso de Uso ────────────────────────
+
+' Todos se autentican
+ADMIN     --> UC_LOGIN
+DIRECTOR  --> UC_LOGIN
+COORD     --> UC_LOGIN
+DOCENTE   --> UC_LOGIN
+ESTUDIANTE --> UC_LOGIN
+INST      --> UC_LOGIN
+
+' Configuracion de conexion (antes del login, cualquiera)
+ADMIN     --> UC_CONF_CONN
+DIRECTOR  --> UC_CONF_CONN
+COORD     --> UC_CONF_CONN
+DOCENTE   --> UC_CONF_CONN
+ESTUDIANTE --> UC_CONF_CONN
+INST      --> UC_CONF_CONN
+
+' Administrador
+ADMIN --> UC_REG_USR
+ADMIN --> UC_PASS
+ADMIN --> UC_CONF_BD
+
+' Practicas (ADMIN y DIRECTOR escriben, COORD solo lee)
+ADMIN    --> UC_CREAR_P
+ADMIN    --> UC_ACT_P
+ADMIN    --> UC_ELIM_P
+DIRECTOR --> UC_CREAR_P
+DIRECTOR --> UC_ACT_P
+DIRECTOR --> UC_ELIM_P
+COORD    --> UC_VER_P
+
+' Instituciones (ADMIN y DIRECTOR escriben, COORD solo lee)
+ADMIN    --> UC_CREAR_I
+DIRECTOR --> UC_CREAR_I
+COORD    --> UC_VER_I
+
+' Grupos (ADMIN, DIRECTOR, COORD crean; DOCENTE solo lee)
+ADMIN    --> UC_CREAR_G
+DIRECTOR --> UC_CREAR_G
+COORD    --> UC_CREAR_G
+DOCENTE  --> UC_VER_G
+
+' Inscripciones (ADMIN, DIRECTOR, COORD, DOCENTE crean; ESTUDIANTE e INST leen)
+ADMIN      --> UC_INSCR
+DIRECTOR   --> UC_INSCR
+COORD      --> UC_INSCR
+DOCENTE    --> UC_INSCR
+ESTUDIANTE --> UC_VER_INS
+INST       --> UC_VER_INS
+
+' ─── Relaciones include / extend ───────────────────────────
+UC_LOGIN  ..> UC_CONF_CONN : <<extend>>
+UC_CREAR_G ..> UC_VER_P    : <<include>>
+UC_CREAR_G ..> UC_VER_I    : <<include>>
+UC_INSCR   ..> UC_VER_G    : <<include>>
+
+@enduml

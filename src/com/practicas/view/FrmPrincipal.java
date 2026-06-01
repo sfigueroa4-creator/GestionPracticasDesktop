@@ -23,6 +23,7 @@ public class FrmPrincipal extends JFrame {
     private PnlInstituciones pnlInstituciones;
     private PnlGrupos pnlGrupos;
     private PnlInscripciones pnlInscripciones;
+    private PnlReportes pnlReportes;
 
     public FrmPrincipal(Usuario usuario) {
         this.usuarioActual = usuario;
@@ -110,6 +111,14 @@ public class FrmPrincipal extends JFrame {
             btn.addActionListener(e -> mostrarPanel("inscripciones"));
         }
 
+        if (rol != RolUsuario.INSTITUCION) {
+            pnlReportes = new PnlReportes(usuarioActual);
+            panelContenido.add(pnlReportes, "reportes");
+            JButton btn = crearBoton("Reportes");
+            panelMenu.add(btn);
+            btn.addActionListener(e -> mostrarPanel("reportes"));
+        }
+
         if (rol == RolUsuario.ADMIN) {
             JButton btn = crearBoton("Configuracion BD");
             panelMenu.add(btn);
@@ -130,6 +139,7 @@ public class FrmPrincipal extends JFrame {
         if (pnlInstituciones != null) pnlInstituciones.recargar();
         if (pnlGrupos != null)        pnlGrupos.recargar();
         if (pnlInscripciones != null) pnlInscripciones.recargar();
+        if (pnlReportes != null)      pnlReportes.recargar();
     }
 
     public PnlGrupos getPnlGrupos() {
@@ -138,6 +148,10 @@ public class FrmPrincipal extends JFrame {
 
     public PnlInscripciones getPnlInscripciones() {
         return pnlInscripciones;
+    }
+
+    public PnlReportes getPnlReportes() {
+        return pnlReportes;
     }
 
     private void mostrarPanel(String nombre) {

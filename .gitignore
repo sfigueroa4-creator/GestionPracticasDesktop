@@ -10,3 +10,7 @@
 # Descarga ojdbc17.jar desde https://www.oracle.com/database/technologies/appdev/jdbc-downloads.html
 # y colócalo en lib/ antes de compilar.
 /lib/
+
+# ZIP de distribución (se sube como GitHub Release, no al repositorio)
+*-release.zip
+/release/

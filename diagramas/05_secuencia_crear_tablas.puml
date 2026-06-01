@@ -1,0 +1,68 @@
+@startuml Secuencia_Crear_Tablas
+
+skinparam sequenceArrowThickness 2
+skinparam roundcorner 5
+skinparam sequence {
+    ArrowColor #A80036
+    ActorBorderColor #A80036
+    LifeLineBorderColor #A80036
+    ParticipantBackgroundColor #FEFECE
+    ParticipantBorderColor #A80036
+}
+
+title Diagrama de Secuencia - Crear Tablas (Admin)
+
+actor       "Administrador"         as ADMIN
+participant "FrmConfiguracionBD"    as CFG
+participant "DatabaseInstaller"     as INST
+participant "DatabaseConnection"    as CONN
+participant "DatabaseConfig"        as DCFG
+database    "Oracle DB"             as DB
+participant "FrmPrincipal"          as MAIN
+
+ADMIN -> CFG : click "Crear tablas"
+activate CFG
+
+CFG -> CFG : verificarAdmin()
+
+alt rol != ADMIN
+    CFG --> ADMIN : "Acceso denegado"
+else rol == ADMIN
+    CFG -> DCFG : getHost(), getPuerto(), getServicio()
+    activate DCFG
+    DCFG --> CFG : parametros de conexion
+    deactivate DCFG
+
+    CFG -> CONN : getConnection("GestionP","GestionP")
+    activate CONN
+    CONN -> DB : DriverManager.getConnection(url)
+    activate DB
+    DB --> CONN : Connection
+    deactivate DB
+    CONN --> CFG : Connection
+    deactivate CONN
+
+    CFG -> INST : new DatabaseInstaller(conn)
+    CFG -> INST : crearTablas()
+    activate INST
+
+    INST -> DB : CREATE TABLE USUARIO ...
+    INST -> DB : CREATE TABLE INSTITUCION_RECEPTORA ...
+    INST -> DB : CREATE TABLE PRACTICA ...
+    INST -> DB : CREATE TABLE GRUPO_PRACTICA ...
+    INST -> DB : CREATE TABLE INSCRIPCION_GRUPO ...
+    INST -> DB : INSERT INTO USUARIO\n(admin por defecto)
+    DB --> INST : OK
+    deactivate INST
+
+    CFG --> ADMIN : "Tablas creadas correctamente"
+
+    CFG -> MAIN : recargarTodo()
+    activate MAIN
+    MAIN -> MAIN : recargar cada panel
+    deactivate MAIN
+end
+
+deactivate CFG
+
+@enduml

@@ -19,20 +19,13 @@ public class InscripcionGrupoDAO {
     public void insertar(InscripcionGrupo i) throws SQLException {
         if (i == null || i.getEstudiante() == null || i.getGrupo() == null || i.getEstado() == null)
             throw new SQLException("Datos incompletos");
-        String sql = """
-            INSERT INTO INSCRIPCION_GRUPO
-            (ID_ESTUDIANTE, ID_GRUPO, HORAS_CUMPLIDAS, ESTADO, FECHA_INSCRIPCION, OBSERVACION_FINAL)
-            VALUES (?, ?, ?, ?, ?, ?)
-        """;
-        PreparedStatement ps = conn.prepareStatement(sql);
-        ps.setInt(1, i.getEstudiante().getIdUsuario());
-        ps.setInt(2, i.getGrupo().getIdGrupo());
-        ps.setDouble(3, i.getHorasCumplidas());
-        ps.setString(4, i.getEstado().name());
-        ps.setTimestamp(5, i.getFechaInscripcion() != null ? Timestamp.valueOf(i.getFechaInscripcion()) : null);
-        ps.setString(6, i.getObservacionFinal());
-        ps.executeUpdate();
-        ps.close();
+        CallableStatement cs = conn.prepareCall("{CALL SP_INSCRIBIR_ESTUDIANTE(?, ?, ?, ?)}");
+        cs.setInt(1, i.getEstudiante().getIdUsuario());
+        cs.setInt(2, i.getGrupo().getIdGrupo());
+        cs.setDouble(3, i.getHorasCumplidas());
+        cs.setString(4, i.getEstado().name());
+        cs.execute();
+        cs.close();
     }
 
     public List<InscripcionGrupo> listar() throws SQLException {
@@ -71,18 +64,13 @@ public class InscripcionGrupoDAO {
     }
 
     public void actualizar(InscripcionGrupo i) throws SQLException {
-        String sql = """
-            UPDATE INSCRIPCION_GRUPO
-            SET HORAS_CUMPLIDAS = ?, ESTADO = ?, OBSERVACION_FINAL = ?
-            WHERE ID_INSCRIPCION = ?
-        """;
-        PreparedStatement ps = conn.prepareStatement(sql);
-        ps.setDouble(1, i.getHorasCumplidas());
-        ps.setString(2, i.getEstado().name());
-        ps.setString(3, i.getObservacionFinal());
-        ps.setInt(4, i.getIdInscripcion());
-        ps.executeUpdate();
-        ps.close();
+        CallableStatement cs = conn.prepareCall("{CALL SP_ACTUALIZAR_HORAS(?, ?, ?, ?)}");
+        cs.setInt(1, i.getIdInscripcion());
+        cs.setDouble(2, i.getHorasCumplidas());
+        cs.setString(3, i.getEstado().name());
+        cs.setString(4, i.getObservacionFinal());
+        cs.execute();
+        cs.close();
     }
 
     public void eliminar(int idInscripcion) throws SQLException {

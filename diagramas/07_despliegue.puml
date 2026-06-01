@@ -1,0 +1,80 @@
+@startuml Despliegue
+
+skinparam node {
+    BackgroundColor #E8FFE8
+    BorderColor #007700
+}
+skinparam component {
+    BackgroundColor #FEFECE
+    BorderColor #A80036
+}
+skinparam database {
+    BackgroundColor #FFFACD
+    BorderColor #A80036
+}
+skinparam artifact {
+    BackgroundColor #EEF0FF
+    BorderColor #5555AA
+}
+skinparam ArrowColor #A80036
+
+title Sistema de Gestion de Practicas - Diagrama de Despliegue
+
+' ─── Nodo cliente ──────────────────────────────────────────
+node "PC Cliente\n(Windows 10+)" as CLIENT {
+
+    node "Java Runtime\n(JRE 17+)" as JRE {
+        component "GestionPracticasDesktop.jar" as APP {
+            component "Vista (Swing)"       as VIEW
+            component "Servicios"           as SVC
+            component "DAOs"                as DAO
+            component "Driver ojdbc17"      as OJDBC
+        }
+    }
+
+    artifact "config.properties\n(host, puerto, servicio)" as CONFIG
+    artifact "iniciar.bat" as BAT
+}
+
+' ─── Nodo servidor local ───────────────────────────────────
+node "Servidor Local\n(localhost:1521)" as SRV_LOCAL {
+    database "Oracle Database XE\nServicio: XEPDB1" as DB_LOCAL {
+        [USUARIO]
+        [PRACTICA]
+        [GRUPO_PRACTICA]
+        [INSTITUCION_RECEPTORA]
+        [INSCRIPCION_GRUPO]
+    }
+}
+
+' ─── Nodo servidor UDI ─────────────────────────────────────
+node "Servidor UDI\n(192.168.254.215:1521)" as SRV_UDI {
+    database "Oracle Database\nServicio: XEPDB1" as DB_UDI {
+        [USUARIO]
+        [PRACTICA]
+        [GRUPO_PRACTICA]
+        [INSTITUCION_RECEPTORA]
+        [INSCRIPCION_GRUPO]
+    }
+}
+
+' ─── Relaciones ────────────────────────────────────────────
+BAT      ..> JRE     : lanza
+APP      --> CONFIG  : lee configuracion
+OJDBC    --> SRV_LOCAL : JDBC TCP/IP\n(conexion local)
+OJDBC    --> SRV_UDI   : JDBC TCP/IP\n(conexion UDI)
+
+note right of CONFIG
+  El usuario puede cambiar
+  host/puerto desde el boton
+  de configuracion en el login
+  sin reiniciar la aplicacion.
+end note
+
+note bottom of CLIENT
+  El JAR incluye todas las
+  dependencias (fat JAR).
+  Solo requiere Java instalado.
+end note
+
+@enduml

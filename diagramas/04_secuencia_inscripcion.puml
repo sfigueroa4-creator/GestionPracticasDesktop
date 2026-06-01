@@ -1,0 +1,93 @@
+@startuml Secuencia_Inscripcion
+
+skinparam sequenceArrowThickness 2
+skinparam roundcorner 5
+skinparam sequence {
+    ArrowColor #A80036
+    ActorBorderColor #A80036
+    LifeLineBorderColor #A80036
+    ParticipantBackgroundColor #FEFECE
+    ParticipantBorderColor #A80036
+}
+
+title Diagrama de Secuencia - Inscribir Estudiante
+
+actor       "Coordinador/Docente"    as USR
+participant "PnlInscripciones"       as PNL
+participant "InscripcionGrupoDAO"    as DAO
+database    "Oracle DB"              as DB
+
+== Carga inicial del panel ==
+
+USR -> PNL : abrir panel Inscripciones
+activate PNL
+
+PNL -> DAO : obtenerEstudiantes()
+activate DAO
+DAO -> DB : SELECT * FROM USUARIO\nWHERE ROL='ESTUDIANTE'
+activate DB
+DB --> DAO : ResultSet
+deactivate DB
+DAO --> PNL : List<Usuario>
+deactivate DAO
+
+PNL -> DAO : obtenerGrupos()
+activate DAO
+DAO -> DB : SELECT * FROM GRUPO_PRACTICA
+activate DB
+DB --> DAO : ResultSet
+deactivate DB
+DAO --> PNL : List<GrupoPractica>
+deactivate DAO
+
+PNL -> DAO : listar()
+activate DAO
+DAO -> DB : SELECT ig.*, u.NOMBRE, g.NOMBRE\nFROM INSCRIPCION_GRUPO ig\nJOIN USUARIO u ...\nJOIN GRUPO_PRACTICA g ...
+activate DB
+DB --> DAO : ResultSet
+deactivate DB
+DAO --> PNL : List<InscripcionGrupo>
+deactivate DAO
+
+PNL --> USR : panel con comboboxes y tabla cargados
+
+== Inscripcion ==
+
+USR -> PNL : seleccionar estudiante,\ngrupo, horas + click Guardar
+activate PNL
+
+PNL -> PNL : construir InscripcionGrupo
+
+PNL -> DAO : insertar(inscripcion)
+activate DAO
+
+DAO -> DAO : validar datos\n(estudiante, grupo, estado != null)
+
+alt datos validos
+    DAO -> DB : INSERT INTO INSCRIPCION_GRUPO\n(ID_ESTUDIANTE, ID_GRUPO,\nHORAS_CUMPLIDAS, ESTADO, ...)
+    activate DB
+    DB --> DAO : OK
+    deactivate DB
+    DAO --> PNL : void
+    deactivate DAO
+
+    PNL -> DAO : listar()
+    activate DAO
+    DAO -> DB : SELECT ...
+    activate DB
+    DB --> DAO : ResultSet
+    deactivate DB
+    DAO --> PNL : List<InscripcionGrupo>
+    deactivate DAO
+
+    PNL --> USR : tabla actualizada\n+ "Inscripcion guardada"
+
+else datos invalidos
+    DAO --> PNL : SQLException
+    deactivate DAO
+    PNL --> USR : "Error: Datos incompletos"
+end
+
+deactivate PNL
+
+@enduml

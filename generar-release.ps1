@@ -112,6 +112,12 @@ if ($verificacion -match "corrupt") {
     Write-Host "ADVERTENCIA: El JAR puede estar corrupto." -ForegroundColor Yellow
 }
 
+# --- Comprimir en ZIP para distribución ---
+Write-Host "  Comprimiendo release..."
+$zipPath = "$base\GestionPracticasDesktop-release.zip"
+if (Test-Path $zipPath) { Remove-Item $zipPath -Force }
+[System.IO.Compression.ZipFile]::CreateFromDirectory($release, $zipPath)
+
 # --- Resultado ---
 Write-Host ""
 Write-Host "============================================" -ForegroundColor Green
@@ -125,6 +131,10 @@ Get-ChildItem $release | ForEach-Object {
             else { "$($_.Length) B" }
     Write-Host ("   {0,-40} {1}" -f $_.Name, $size) -ForegroundColor White
 }
+Write-Host "--------------------------------------------" -ForegroundColor Green
+Write-Host " ZIP para distribucion:" -ForegroundColor Green
+$zipSize = "{0:N1} MB" -f ((Get-Item $zipPath).Length / 1MB)
+Write-Host "   GestionPracticasDesktop-release.zip      $zipSize" -ForegroundColor White
 Write-Host "============================================" -ForegroundColor Green
 Write-Host ""
 Read-Host "Pulsa Enter para salir"

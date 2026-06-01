@@ -1,0 +1,63 @@
+@startuml Secuencia_Login
+
+skinparam sequenceArrowThickness 2
+skinparam roundcorner 5
+skinparam sequenceParticipant underline
+skinparam sequence {
+    ArrowColor #A80036
+    ActorBorderColor #A80036
+    LifeLineBorderColor #A80036
+    ParticipantBackgroundColor #FEFECE
+    ParticipantBorderColor #A80036
+}
+
+title Diagrama de Secuencia - Inicio de Sesion
+
+actor       "Usuario"           as USR
+participant "FrmLogin"          as LOGIN
+participant "AuthService"       as AUTH
+participant "UsuarioDAO"        as DAO
+database    "Oracle DB"         as DB
+participant "FrmPrincipal"      as MAIN
+
+USR -> LOGIN : introducir email y contrasena\n+ click Ingresar
+
+activate LOGIN
+
+LOGIN -> AUTH : login(email, password)
+activate AUTH
+
+AUTH -> DAO : login(email, passwordHash)
+activate DAO
+
+DAO -> DB : SELECT * FROM USUARIO\nWHERE EMAIL=? AND PASSWORD_HASH=?\nAND ACTIVO=1
+activate DB
+DB --> DAO : ResultSet
+deactivate DB
+
+alt credenciales validas
+    DAO --> AUTH : Usuario
+    deactivate DAO
+    AUTH --> LOGIN : Usuario
+    deactivate AUTH
+
+    LOGIN -> MAIN : new FrmPrincipal(usuario)
+    activate MAIN
+    MAIN -> MAIN : construir menu\nsegun rol
+    MAIN --> LOGIN : ventana lista
+    deactivate MAIN
+
+    LOGIN -> LOGIN : dispose()
+    LOGIN --> USR : ventana principal visible
+
+else credenciales invalidas
+    DAO --> AUTH : null
+    deactivate DAO
+    AUTH --> LOGIN : null
+    deactivate AUTH
+    LOGIN --> USR : "Credenciales invalidas"
+end
+
+deactivate LOGIN
+
+@enduml
