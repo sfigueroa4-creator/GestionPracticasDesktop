@@ -43,7 +43,8 @@ public class PnlInstituciones extends JPanel {
 
         try {
             java.sql.Connection con =
-                com.practicas.util.DatabaseConnection.getConnection("GestionP", "GestionP");
+                com.practicas.util.DatabaseConnection.getConnectionPorRol(
+                    frmPrincipal != null ? frmPrincipal.getUsuarioActual().getRol() : com.practicas.model.RolUsuario.ADMIN);
             institucionDAO = new InstitucionReceptoraDAO(con);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Error conexion: " + e.getMessage());
@@ -95,7 +96,8 @@ public class PnlInstituciones extends JPanel {
     public void recargar() {
         try {
             java.sql.Connection con =
-                com.practicas.util.DatabaseConnection.getConnection("GestionP", "GestionP");
+                com.practicas.util.DatabaseConnection.getConnectionPorRol(
+                    frmPrincipal != null ? frmPrincipal.getUsuarioActual().getRol() : com.practicas.model.RolUsuario.ADMIN);
             institucionDAO = new InstitucionReceptoraDAO(con);
             cargarInstituciones();
         } catch (Exception e) {

@@ -34,7 +34,8 @@ public class PnlUsuarios extends JPanel {
 
         try {
             java.sql.Connection con =
-                com.practicas.util.DatabaseConnection.getConnection("GestionP", "GestionP");
+                com.practicas.util.DatabaseConnection.getConnectionPorRol(
+                    frmPrincipal != null ? frmPrincipal.getUsuarioActual().getRol() : com.practicas.model.RolUsuario.ADMIN);
             authService = new AuthService(con);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Error de conexion: " + e.getMessage());
@@ -187,7 +188,8 @@ public class PnlUsuarios extends JPanel {
     public void recargar() {
         try {
             java.sql.Connection con =
-                com.practicas.util.DatabaseConnection.getConnection("GestionP", "GestionP");
+                com.practicas.util.DatabaseConnection.getConnectionPorRol(
+                    frmPrincipal != null ? frmPrincipal.getUsuarioActual().getRol() : com.practicas.model.RolUsuario.ADMIN);
             authService = new AuthService(con);
             cargarUsuarios();
         } catch (Exception e) {

@@ -126,15 +126,16 @@ public class FrmLogin extends JFrame {
 
                 JOptionPane.showMessageDialog(
                     this,
-                    "Bienvenido "
-                    + usuario.getNombre()
+                    "Bienvenido " + usuario.getNombre()
                 );
 
-                FrmPrincipal frm =
-                    new FrmPrincipal(usuario);
+                // Reconectar con el usuario Oracle correspondiente al rol
+                Connection connRol =
+                    com.practicas.util.DatabaseConnection
+                        .getConnectionPorRol(usuario.getRol());
 
+                FrmPrincipal frm = new FrmPrincipal(usuario, connRol);
                 frm.setVisible(true);
-
                 dispose();
 
             } else {

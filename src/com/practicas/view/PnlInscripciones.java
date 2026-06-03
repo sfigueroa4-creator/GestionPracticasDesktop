@@ -25,6 +25,8 @@ public class PnlInscripciones extends JPanel {
     private JComboBox<GrupoPractica> cbGrupo;
     private JTextField txtHoras;
 
+    private final Usuario usuario;
+
 
     private static boolean puedeEscribir(Usuario u) {
         if (u == null) return false;
@@ -40,13 +42,15 @@ public class PnlInscripciones extends JPanel {
     }
 
     public PnlInscripciones(Usuario usuario) {
+        this.usuario = usuario;
         boolean escritura = puedeEscribir(usuario);
 
         setLayout(new BorderLayout());
 
         try {
             java.sql.Connection con =
-                com.practicas.util.DatabaseConnection.getConnection("GestionP", "GestionP");
+                com.practicas.util.DatabaseConnection.getConnectionPorRol(
+                    usuario != null ? usuario.getRol() : com.practicas.model.RolUsuario.ESTUDIANTE);
             inscripcionDAO = new InscripcionGrupoDAO(con);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Error conexion: " + e.getMessage());
@@ -101,7 +105,8 @@ public class PnlInscripciones extends JPanel {
     public void recargar() {
         try {
             java.sql.Connection con =
-                com.practicas.util.DatabaseConnection.getConnection("GestionP", "GestionP");
+                com.practicas.util.DatabaseConnection.getConnectionPorRol(
+                    usuario != null ? usuario.getRol() : com.practicas.model.RolUsuario.ESTUDIANTE);
             inscripcionDAO = new InscripcionGrupoDAO(con);
             cargarEstudiantes();
             cargarGrupos();

@@ -104,7 +104,8 @@ public class PnlReportes extends JPanel {
     }
 
     private void cargarAvance() {
-        try (Connection conn = DatabaseConnection.getConnection("GestionP", "GestionP")) {
+        try (Connection conn = DatabaseConnection.getConnectionPorRol(
+                usuario != null ? usuario.getRol() : com.practicas.model.RolUsuario.ESTUDIANTE)) {
             ReportesDAO dao = new ReportesDAO(conn);
             List<Object[]> datos = dao.reporteAvancePorEstudiante();
             modeloAvance.setRowCount(0);
@@ -119,7 +120,8 @@ public class PnlReportes extends JPanel {
     }
 
     private void cargarOcupacion() {
-        try (Connection conn = DatabaseConnection.getConnection("GestionP", "GestionP")) {
+        try (Connection conn = DatabaseConnection.getConnectionPorRol(
+                usuario != null ? usuario.getRol() : com.practicas.model.RolUsuario.ESTUDIANTE)) {
             ReportesDAO dao = new ReportesDAO(conn);
             List<Object[]> datos = dao.reporteOcupacionGrupos();
             modeloOcupacion.setRowCount(0);
@@ -134,7 +136,8 @@ public class PnlReportes extends JPanel {
     }
 
     private void cargarEstudiantes() {
-        try (Connection conn = DatabaseConnection.getConnection("GestionP", "GestionP")) {
+        try (Connection conn = DatabaseConnection.getConnectionPorRol(
+                usuario != null ? usuario.getRol() : com.practicas.model.RolUsuario.ESTUDIANTE)) {
             ReportesDAO dao = new ReportesDAO(conn);
             List<Object[]> datos = dao.reporteEstudiantesPorPractica();
             modeloEstudiantes.setRowCount(0);
@@ -149,7 +152,8 @@ public class PnlReportes extends JPanel {
     }
 
     private void cargarAuditoria() {
-        try (Connection conn = DatabaseConnection.getConnection("GestionP", "GestionP")) {
+        try (Connection conn = DatabaseConnection.getConnectionPorRol(
+                usuario != null ? usuario.getRol() : com.practicas.model.RolUsuario.ESTUDIANTE)) {
             ReportesDAO dao = new ReportesDAO(conn);
             List<Object[]> datos = dao.reporteAuditoriaPassword();
             modeloAuditoria.setRowCount(0);

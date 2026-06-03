@@ -101,7 +101,8 @@ public class PnlPracticas extends JPanel {
 
         try {
             java.sql.Connection con =
-                com.practicas.util.DatabaseConnection.getConnection("GestionP", "GestionP");
+                com.practicas.util.DatabaseConnection.getConnectionPorRol(
+                    frmPrincipal != null ? frmPrincipal.getUsuarioActual().getRol() : com.practicas.model.RolUsuario.ADMIN);
             practicaService = new PracticaService(con);
             cargarPracticas();
         } catch (Exception e) {
@@ -112,7 +113,8 @@ public class PnlPracticas extends JPanel {
     public void recargar() {
         try {
             java.sql.Connection con =
-                com.practicas.util.DatabaseConnection.getConnection("GestionP", "GestionP");
+                com.practicas.util.DatabaseConnection.getConnectionPorRol(
+                    frmPrincipal != null ? frmPrincipal.getUsuarioActual().getRol() : com.practicas.model.RolUsuario.ADMIN);
             practicaService = new PracticaService(con);
             cargarPracticas();
         } catch (Exception e) {

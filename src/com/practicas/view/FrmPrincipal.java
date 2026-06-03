@@ -26,18 +26,18 @@ public class FrmPrincipal extends JFrame {
     private PnlReportes pnlReportes;
 
     public FrmPrincipal(Usuario usuario) {
+        this(usuario, null);
+    }
+
+    public FrmPrincipal(Usuario usuario, Connection conexionRol) {
         this.usuarioActual = usuario;
 
         try {
-            conn = DatabaseConnection.getConnection(
-                    "GestionP",
-                    "GestionP"
-            );
+            conn = (conexionRol != null)
+                ? conexionRol
+                : DatabaseConnection.getConnectionPorRol(usuario.getRol());
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(
-                    null,
-                    "Error de conexion: " + e.getMessage()
-            );
+            JOptionPane.showMessageDialog(null, "Error de conexion: " + e.getMessage());
             return;
         }
 
