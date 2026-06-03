@@ -49,8 +49,11 @@ public class FrmConfiguracionBD extends JDialog {
         btnCancelar.addActionListener(e -> dispose());
 
         if (soloConexion) {
-            setLayout(new GridLayout(4, 2, 8, 8));
-            setSize(400, 200);
+            JButton btnCrear = new JButton("Crear tablas (primera vez)");
+            btnCrear.addActionListener(e -> crearTablasSinAuth());
+
+            setLayout(new GridLayout(5, 2, 8, 8));
+            setSize(400, 240);
             getRootPane().setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
             add(new JLabel("Host"));
@@ -61,6 +64,8 @@ public class FrmConfiguracionBD extends JDialog {
             add(txtServicio);
             add(btnGuardar);
             add(btnCancelar);
+            add(new JLabel("¿Primera instalación?"));
+            add(btnCrear);
         } else {
             setLayout(new GridLayout(5, 2, 8, 8));
             setSize(400, 280);
@@ -112,6 +117,40 @@ public class FrmConfiguracionBD extends JDialog {
 
         JOptionPane.showMessageDialog(this, "Configuración guardada");
         dispose();
+    }
+
+    /** Crea las tablas sin requerir sesion iniciada. Solo para la primera instalacion. */
+    private void crearTablasSinAuth() {
+        // Guardar configuracion de conexion antes de intentar
+        DatabaseConfig.guardar(
+            txtHost.getText().trim(),
+            txtPuerto.getText().trim(),
+            txtServicio.getText().trim()
+        );
+
+        int confirm = JOptionPane.showConfirmDialog(
+            this,
+            "Esto creará las tablas y el usuario administrador inicial (GestionP/GestionP).\n" +
+            "Solo debe ejecutarse una vez. ¿Continuar?",
+            "Primera instalación",
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.INFORMATION_MESSAGE
+        );
+        if (confirm != JOptionPane.YES_OPTION) return;
+
+        try {
+            Connection con = DatabaseConnection.getConnection("GestionP", "GestionP");
+            new DatabaseInstaller(con).crearTablas();
+            JOptionPane.showMessageDialog(this,
+                "Tablas creadas correctamente.\nAhora puede iniciar sesión con GestionP / GestionP.",
+                "Instalación completada", JOptionPane.INFORMATION_MESSAGE);
+            con.close();
+            dispose();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this,
+                "Error al crear tablas: " + e.getMessage(),
+                "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     private void crearTablas() {

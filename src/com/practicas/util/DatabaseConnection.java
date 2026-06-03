@@ -16,25 +16,12 @@ public class DatabaseConnection {
         return DriverManager.getConnection(url, usuario, password);
     }
 
-    /** Conexion usando el usuario Oracle correspondiente al rol de la aplicacion. */
-    public static Connection getConnectionPorRol(RolUsuario rol) throws SQLException {
-        String[] credenciales = credencialesPorRol(rol);
-        return getConnection(credenciales[0], credenciales[1]);
-    }
-
     /**
-     * Retorna {usuario, contrasena} Oracle para cada rol de la aplicacion.
-     * Estas credenciales corresponden a los usuarios creados por DatabaseInstaller.
+     * Conexion para la sesion activa de la aplicacion.
+     * Usa el usuario owner (GestionP) para todos los roles; el control de acceso
+     * se aplica a nivel de aplicacion segun el RolUsuario del usuario autenticado.
      */
-    public static String[] credencialesPorRol(RolUsuario rol) {
-        switch (rol) {
-            case ADMIN:        return new String[]{"USR_ADMIN",       "Adm1nGP#"};
-            case DIRECTOR:     return new String[]{"USR_DIRECTOR",    "Dir3ctGP#"};
-            case COORDINADOR:  return new String[]{"USR_COORDINADOR", "Coord3GP#"};
-            case DOCENTE:      return new String[]{"USR_DOCENTE",     "Doc3ntGP#"};
-            case ESTUDIANTE:   return new String[]{"USR_ESTUDIANTE",  "Est4dGP#"};
-            case INSTITUCION:  return new String[]{"USR_INSTITUCION", "Inst1tGP#"};
-            default:           return new String[]{"GestionP",        "GestionP"};
-        }
+    public static Connection getConnectionPorRol(RolUsuario rol) throws SQLException {
+        return getConnection("GestionP", "GestionP");
     }
 }

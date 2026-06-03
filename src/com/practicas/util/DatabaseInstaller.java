@@ -184,6 +184,7 @@ public class DatabaseInstaller {
             "INSERT INTO USUARIO (NOMBRE, APELLIDO, EMAIL, PASSWORD_HASH, ROL, ACTIVO) " +
             "VALUES ('GestionP', 'Admin', 'GestionP', 'GestionP', 'ADMIN', 1)"
         );
+        conn.commit(); // confirmar el usuario admin antes de continuar con DDL
 
         // ─── USUARIOS ORACLE POR ROL ─────────────────────────────────────────
         // Cada rol de la aplicacion tiene su propio usuario Oracle con privilegios
@@ -194,6 +195,10 @@ public class DatabaseInstaller {
         // ─── ROLES Y PRIVILEGIOS ─────────────────────────────────────────────
 
         crearRolesYPrivilegios(st);
+
+        // ─── SINONIMOS PUBLICOS (para que USR_* accedan sin prefijo de esquema) ─
+
+        crearSinonimosPublicos(st);
 
         // ─── PROCEDIMIENTOS ──────────────────────────────────────────────────
 
@@ -208,6 +213,24 @@ public class DatabaseInstaller {
         crearDisparadores(st);
 
         st.close();
+    }
+
+    private void crearSinonimosPublicos(Statement st) throws SQLException {
+        // Los usuarios de rol (USR_ADMIN, USR_DOCENTE, etc.) conectan a su propio
+        // esquema. Sin sinonimos publicos, "SELECT * FROM USUARIO" falla porque la
+        // tabla esta en el esquema GestionP. Los sinonimos resuelven eso.
+        String[] tablas = {
+            "USUARIO", "INSTITUCION_RECEPTORA", "PRACTICA",
+            "GRUPO_PRACTICA", "INSCRIPCION_GRUPO", "AUDITORIA_PASSWORD"
+        };
+        for (String tabla : tablas) {
+            try {
+                st.executeUpdate(
+                    "CREATE OR REPLACE PUBLIC SYNONYM " + tabla +
+                    " FOR " + tabla
+                );
+            } catch (Exception e) { /* ignorar si no tiene permiso de sinonimo publico */ }
+        }
     }
 
     private void crearUsuariosOracle(Statement st) throws SQLException {
@@ -455,6 +478,14 @@ public class DatabaseInstaller {
         try { st.executeUpdate("DROP ROLE ROL_DOCENTE"); } catch (Exception e) {}
         try { st.executeUpdate("DROP ROLE ROL_ESTUDIANTE"); } catch (Exception e) {}
         try { st.executeUpdate("DROP ROLE ROL_INSTITUCION"); } catch (Exception e) {}
+
+        // Sinonimos publicos
+        try { st.executeUpdate("DROP PUBLIC SYNONYM USUARIO"); } catch (Exception e) {}
+        try { st.executeUpdate("DROP PUBLIC SYNONYM INSTITUCION_RECEPTORA"); } catch (Exception e) {}
+        try { st.executeUpdate("DROP PUBLIC SYNONYM PRACTICA"); } catch (Exception e) {}
+        try { st.executeUpdate("DROP PUBLIC SYNONYM GRUPO_PRACTICA"); } catch (Exception e) {}
+        try { st.executeUpdate("DROP PUBLIC SYNONYM INSCRIPCION_GRUPO"); } catch (Exception e) {}
+        try { st.executeUpdate("DROP PUBLIC SYNONYM AUDITORIA_PASSWORD"); } catch (Exception e) {}
 
         // Tablas
         try { st.executeUpdate("DROP TABLE AUDITORIA_PASSWORD CASCADE CONSTRAINTS"); } catch (Exception e) {}

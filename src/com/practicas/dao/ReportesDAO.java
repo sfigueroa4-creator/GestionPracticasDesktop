@@ -16,7 +16,9 @@ public class ReportesDAO {
         List<Object[]> lista = new ArrayList<>();
         String sql = "SELECT u.NOMBRE, u.APELLIDO, g.NOMBRE AS GRUPO, "
                 + "ig.HORAS_CUMPLIDAS, p.HORAS_REGLAMENTARIAS, "
-                + "FN_PORCENTAJE_HORAS(ig.ID_INSCRIPCION) AS PORCENTAJE "
+                + "CASE WHEN p.HORAS_REGLAMENTARIAS = 0 THEN 0 "
+                + "     ELSE LEAST(ROUND((ig.HORAS_CUMPLIDAS / p.HORAS_REGLAMENTARIAS) * 100, 2), 100) "
+                + "END AS PORCENTAJE "
                 + "FROM INSCRIPCION_GRUPO ig "
                 + "JOIN USUARIO u ON ig.ID_ESTUDIANTE = u.ID_USUARIO "
                 + "JOIN GRUPO_PRACTICA g ON ig.ID_GRUPO = g.ID_GRUPO "
@@ -40,9 +42,11 @@ public class ReportesDAO {
     public List<Object[]> reporteOcupacionGrupos() throws SQLException {
         List<Object[]> lista = new ArrayList<>();
         String sql = "SELECT g.NOMBRE AS GRUPO, g.CUPO_MAXIMO, "
-                + "FN_INSCRITOS_ACTIVOS(g.ID_GRUPO) AS INSCRITOS_ACTIVOS, "
-                + "(g.CUPO_MAXIMO - FN_INSCRITOS_ACTIVOS(g.ID_GRUPO)) AS CUPOS_DISPONIBLES "
+                + "COUNT(CASE WHEN ig.ESTADO NOT IN ('RETIRADO', 'REPROBADO') THEN 1 END) AS INSCRITOS_ACTIVOS, "
+                + "(g.CUPO_MAXIMO - COUNT(CASE WHEN ig.ESTADO NOT IN ('RETIRADO', 'REPROBADO') THEN 1 END)) AS CUPOS_DISPONIBLES "
                 + "FROM GRUPO_PRACTICA g "
+                + "LEFT JOIN INSCRIPCION_GRUPO ig ON g.ID_GRUPO = ig.ID_GRUPO "
+                + "GROUP BY g.ID_GRUPO, g.NOMBRE, g.CUPO_MAXIMO "
                 + "ORDER BY g.NOMBRE";
         try (PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {

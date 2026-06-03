@@ -18,7 +18,7 @@ public class DatabaseConfig {
     }
 
     public static String getHost() {
-        return load().getProperty("host", "localhost");
+        return load().getProperty("host", "192.168.254.215");
     }
 
     public static String getPuerto() {
@@ -26,7 +26,7 @@ public class DatabaseConfig {
     }
 
     public static String getServicio() {
-        return load().getProperty("service", "XEPDB1");
+        return load().getProperty("service", "orcl");
     }
 
     public static void guardar(String host, String puerto, String servicio) {
